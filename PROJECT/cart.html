@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous" />
+
+
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <input type="checkbox" name="" id="toggler">
+
+        <label for="toggler" class="fas fa-bars"></label>
+        <a href="index.html" class="logo">store <span>.</span></a>
+        <nav class="navbar">
+            <a href="index.html">home</a>
+            <a href="about.html">about</a>
+            <a href="products.html">products</a>
+            <a href="contact.html">contact</a>
+        </nav>
+
+        <nav class="icons">
+            <a href="#" class="fas fa-shopping-cart"></a>
+            <a href="#" class="fas fa-envelope"></a>
+            <a href="#" class="fas fa-bell"></a>
+            <a href="#" class="fas fa-credit-card"></a>
+
+
+        </nav>
+    </header>
+
+
+
+    <!-- Cart section -->
+    <section class="cart container mt-5 my-3 py-5">
+        <div class="container mt-5">
+            <h2 class="font-weight-bold">Your Cart</h2>
+            <hr>
+        </div>
+        <table class="mt-5 pt-5">
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="product-info">
+                        <img src="assets/imgs/product1.jpg" alt="">
+                        <div>
+                            <p>Chair</p>
+                            <small><span>$</span>119</small>
+                            <br>
+                            <form>
+                                <input type="submit" class="remove-btn" value="remove">
+                            </form>
+                        </div>
+                    </div>
+                </td>
+
+                <td>
+                    <form>
+                        <input type="number" value="1">
+                        <input type="submit" class="edit-btn" value="edit">
+                    </form>
+                </td>
+
+                <td>
+                    <span class="product-price">$119</span>
+                </td>
+
+            </tr>
+
+
+            <tr>
+                <td>
+                    <div class="product-info">
+                        <img src="assets/imgs/product (5).jpg" alt="">
+                        <div>
+                            <p>Sofia</p>
+                            <small><span>$</span>429</small>
+                            <br>
+                            <form>
+                                <input type="submit" class="remove-btn" value="remove">
+                            </form>
+                        </div>
+                    </div>
+                </td>
+
+                <td>
+                    <form>
+                        <input type="number" value="1">
+                        <input type="submit" class="edit-btn" value="edit">
+                    </form>
+                </td>
+
+                <td>
+                    <span class="product-price">$429</span>
+                </td>
+
+            </tr>
+
+
+            <tr>
+                <td>
+                    <div class="product-info">
+                        <img src="assets/imgs/product4.jpg" alt="">
+                        <div>
+                            <p>lamp</p>
+                            <small><span>$</span>59</small>
+                            <br>
+                            <form>
+                                <input type="submit" class="remove-btn" value="remove">
+                            </form>
+                        </div>
+                    </div>
+                </td>
+
+                <td>
+                    <form>
+                        <input type="number" value="1">
+                        <input type="submit" class="edit-btn" value="edit">
+                    </form>
+                </td>
+
+                <td>
+                    <span class="product-price">$59</span>
+                </td>
+
+            </tr>
+
+        </table>
+
+
+        <div class="cart-total">
+            <table>
+                <tr>
+                    <td>Total</td>
+                    <td>$607</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="checkout-container">
+            <form>
+                <input type="submit" class="btn checkout-btn" value="checkout">
+            </form>
+        </div>
+
+
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Footer section -->
+
+    <section class="footer">
+        <div class="box-container">
+            <div class="box">
+                <h3>quick links</h3>
+                <a href="#home">home</a>
+                <a href="#about">about</a>
+                <a href="#features">features</a>
+                <a href="#products">products</a>
+                <a href="#review">reviews</a>
+                <a href="#contact">contact</a>
+            </div>
+
+            <div class="box">
+                <h3>extra links</h3>
+                <a href="#">cart</a>
+                <a href="#">Products</a>
+                <a href="#">special offers</a>
+            </div>
+
+            <div class="box">
+                <h3>locations</h3>
+                <p>Cairo</p>
+                <p>Giza</p>
+                <p>Alex</p>
+                <p>Mansoura</p>
+            </div>
+
+            <div class="box">
+                <h3>contact info</h3>
+                <p>+123 456 7890</p>
+                <p>info@email.com</p>
+            </div>
+
+        </div>
+        <div class="credit">created by <span>mohamedenab2015@gmail.com</span> |all rights reserved </div>
+    </section>
+    <!-- end of Footer section -->
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+
+</html>
