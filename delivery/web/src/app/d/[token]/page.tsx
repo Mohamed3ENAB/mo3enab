@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
-import { getProviderByToken } from '@/lib/queries';
+import Link from 'next/link';
+import { getProviderByToken, getOpenRequests, getRequestThreadCounts } from '@/lib/queries';
 import { SERVICE_LABELS } from '@/lib/types';
 import { sinceArabic } from '@/lib/format';
 import { AvailabilityToggle } from './toggle';
 import { Avatar } from '@/components/Avatar';
-import { Check, Info, Alert, Pin } from '@/components/icons';
+import { Check, Info, Alert, Pin, Chat, Clock } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,9 @@ export default async function DriverPage({ params }: { params: Promise<{ token: 
   const { token } = await params;
   const me = await getProviderByToken(token);
   if (!me) notFound();
+
+  const [requests, counts] = await Promise.all([getOpenRequests(), getRequestThreadCounts()]);
+  const countBy = new Map(counts.map((c) => [c.request_id, Number(c.n)]));
 
   const live =
     me.is_available &&
@@ -53,6 +57,35 @@ export default async function DriverPage({ params }: { params: Promise<{ token: 
           يقدر يفتح ويقفل توفرك.
         </span>
       </div>
+
+      <h2>طلبات مفتوحة دلوقتي</h2>
+      {requests.length === 0 ? (
+        <p className="lede">مفيش طلبات دلوقتي.</p>
+      ) : (
+        requests.map((r) => (
+          <div className="req" key={r.id}>
+            <p>{r.body}</p>
+            <div className="when">
+              {r.zone_name ? (
+                <>
+                  <Pin size={13} /> {r.zone_name}
+                </>
+              ) : null}
+              <Clock size={13} /> {sinceArabic(r.created_at)}
+              {countBy.get(r.id) ? (
+                <span className="pill info">{countBy.get(r.id)} رسالة</span>
+              ) : null}
+            </div>
+            <Link
+              className="btn ghost wide"
+              href={`/t/p/${token}/${r.id}`}
+              style={{ marginTop: 12 }}
+            >
+              <Chat size={18} /> رد داخل التطبيق
+            </Link>
+          </div>
+        ))
+      )}
     </main>
   );
 }

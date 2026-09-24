@@ -612,3 +612,78 @@ details.offline .cards { margin-top: 12px; }
 .tile .t b { display: block; font-size: 16px; font-weight: 800; }
 .tile .t span { color: var(--ink-500); font-size: 13.5px; }
 .tile .go { color: var(--ink-300); transform: rotate(90deg); flex: 0 0 auto; }
+
+/* ---------- صور الحسابات ---------- */
+
+.avatar.photo { background: var(--canvas); overflow: visible; }
+.avatar.photo img {
+  width: 100%; height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- رفع صورة ---------- */
+
+.photofield {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border: 1.5px dashed var(--line);
+  border-radius: var(--r-md); padding: 14px; margin-bottom: 14px;
+}
+.photofield .prev {
+  width: 64px; height: 64px; border-radius: 20px; flex: 0 0 auto;
+  background: var(--canvas); color: var(--ink-400);
+  display: grid; place-items: center; overflow: hidden;
+}
+.photofield .prev img { width: 100%; height: 100%; object-fit: cover; }
+.photofield .t { flex: 1; min-width: 0; }
+.photofield .t b { display: block; font-size: 15px; font-weight: 800; }
+.photofield .t span { color: var(--ink-500); font-size: 13px; }
+.photofield input[type='file'] { display: none; }
+.photofield .pick {
+  border: 1.5px solid var(--line); background: var(--canvas); color: var(--ink-700);
+  border-radius: 12px; padding: 10px 14px; font-size: 14.5px; font-weight: 700;
+  cursor: pointer; min-height: 44px; flex: 0 0 auto;
+}
+
+/* ---------- الريفيوز ---------- */
+
+.review { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.review:last-child { border-bottom: 0; }
+.review .top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.review .who { font-weight: 800; font-size: 14.5px; }
+.review .when { color: var(--ink-400); font-size: 12.5px; margin-inline-start: auto; }
+.review p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--ink-700); }
+.stars-row { display: inline-flex; gap: 1px; color: var(--amber); }
+.stars-row .off { color: var(--ink-300); }
+
+/* ---------- إحصائيات الإدارة ---------- */
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.stat {
+  background: var(--surface); border-radius: var(--r-md);
+  box-shadow: var(--sh-card); padding: 13px 12px; text-align: center;
+}
+.stat b { display: block; font-size: 23px; font-weight: 800; letter-spacing: -.02em; }
+.stat span { font-size: 12px; color: var(--ink-500); font-weight: 700; }
+.stat.alert b { color: var(--rose); }
+.stat.good b { color: var(--brand-600); }
+
+/* ---------- المحادثة ---------- */
+
+.chat { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.bubble-msg {
+  max-width: 80%; padding: 11px 14px; border-radius: 18px;
+  font-size: 15px; line-height: 1.55;
+}
+.bubble-msg.mine {
+  align-self: flex-start; background: var(--brand-600); color: #fff;
+  border-end-start-radius: 6px;
+}
+.bubble-msg.theirs {
+  align-self: flex-end; background: var(--surface); color: var(--ink-900);
+  box-shadow: var(--sh-card); border-end-end-radius: 6px;
+}
+.bubble-msg .who { display: block; font-size: 12px; font-weight: 800; opacity: .8; margin-bottom: 3px; }
+.bubble-msg .at { display: block; font-size: 11px; opacity: .65; margin-top: 4px; }
+.chat-empty { text-align: center; color: var(--ink-400); font-size: 14.5px; padding: 26px 0; }

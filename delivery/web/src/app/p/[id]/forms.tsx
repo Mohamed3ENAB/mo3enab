@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { rateProvider, reportProvider } from '@/app/actions';
+import { rateTarget, reportProvider } from '@/app/actions';
 import { REPORT_REASONS } from '@/lib/types';
 import { Star, Alert } from '@/components/icons';
 
@@ -19,7 +19,7 @@ export function FeedbackForms({ providerId, name }: { providerId: string; name: 
         className="card"
         action={(fd) =>
           start(async () => {
-            const r = await rateProvider(fd);
+            const r = await rateTarget(fd);
             setRateMsg(
               r.ok
                 ? { ok: true, text: 'شكرًا. تقييمك اتسجل.' }
@@ -45,6 +45,11 @@ export function FeedbackForms({ providerId, name }: { providerId: string; name: 
         <label className="field">
           <span>تحب تضيف حاجة؟ (اختياري)</span>
           <textarea name="comment" maxLength={300} placeholder="جه بسرعة والمعاملة كويسة" />
+        </label>
+
+        <label className="field">
+          <span>اسمك (اختياري)</span>
+          <input name="author_name" maxLength={40} placeholder="هيظهر جنب رأيك" />
         </label>
 
         <button className="btn wide" type="submit" disabled={pending}>

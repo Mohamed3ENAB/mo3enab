@@ -18,6 +18,10 @@ language sql stable security definer set search_path = public as $$
   select coalesce(current_setting('app.is_admin', true) = 'on', false);
 $$;
 
+alter table images           enable row level security;
+alter table applications     enable row level security;
+alter table threads          enable row level security;
+alter table messages         enable row level security;
 alter table providers        enable row level security;
 alter table provider_tokens  enable row level security;
 alter table availability_log enable row level security;
@@ -32,6 +36,12 @@ alter table admins           enable row level security;
 create policy z_read     on service_zones for select using (is_active);
 create policy pg_read    on price_guide   for select using (is_active);
 create policy prov_read  on providers     for select using (is_active);
+create policy img_read   on images        for select using (true);
+
+-- 🔴 طلبات الانضمام والمحادثات: الإدارة بس.
+create policy app_admin  on applications  for all using (is_admin()) with check (is_admin());
+create policy thr_admin  on threads       for all using (is_admin()) with check (is_admin());
+create policy msg_admin  on messages      for all using (is_admin()) with check (is_admin());
 
 -- الكتابة للإدارة بس
 create policy prov_write  on providers    for all using (is_admin()) with check (is_admin());
@@ -79,6 +89,7 @@ grant execute on function my_provider(text) to anon, authenticated;
 
 -- 🔴 التوكنات والبلاغات: مفيش grant للزائر نهائيًا
 revoke all on provider_tokens from anon, authenticated;
+revoke all on applications, threads, messages from anon;
 revoke all on reports from anon;
 grant insert on reports to anon;
 

@@ -33,6 +33,7 @@ export type Provider = {
   availability_updated_at: string | null;
   rating_avg: string | null;
   rating_count: string;
+  photo_id: string | null;
 };
 
 export type OpenRequest = {
@@ -106,6 +107,9 @@ export type Place = {
   address_note: string | null;
   hours_note: string | null;
   note: string | null;
+  photo_id: string | null;
+  rating_avg: string | null;
+  rating_count: string;
 };
 
 export type VehicleRate = {

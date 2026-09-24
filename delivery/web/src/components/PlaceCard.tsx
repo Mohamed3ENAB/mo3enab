@@ -4,7 +4,8 @@ import { useState } from 'react';
 import type { Place, Provider } from '@/lib/types';
 import { PLACE_LABELS } from '@/lib/types';
 import { telHref, waHref } from '@/lib/format';
-import { PLACE_ICON, SERVICE_ICON, Phone, WhatsApp, Pin, Clock } from './icons';
+import { PLACE_ICON, SERVICE_ICON, Phone, WhatsApp, Pin, Clock, Star } from './icons';
+import Link from 'next/link';
 
 export function PlaceCard({
   place,
@@ -29,13 +30,25 @@ export function PlaceCard({
         className="row rise"
         style={{ animationDelay: `${Math.min(index, 8) * 50}ms` }}
       >
-        <span className={`avatar b-${place.category}`} aria-hidden="true">
-          <Icon size={24} />
-        </span>
+        {place.photo_id ? (
+          <span className="avatar photo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/img/${place.photo_id}`} alt="" loading="lazy" decoding="async" />
+          </span>
+        ) : (
+          <span className={`avatar b-${place.category}`} aria-hidden="true">
+            <Icon size={24} />
+          </span>
+        )}
 
         <div>
           <div className="head">
             <h3>{place.name_ar}</h3>
+            {Number(place.rating_count) > 0 ? (
+              <span className="rate">
+                <Star /> {place.rating_avg}
+              </span>
+            ) : null}
           </div>
 
           <p className="meta">
@@ -56,6 +69,9 @@ export function PlaceCard({
             <button className="btn call" onClick={() => setSheet(true)}>
               اطلب من هنا
             </button>
+            <Link className="btn quiet" href={`/m/${place.id}`} aria-label="تفاصيل وتقييم">
+              <Star size={16} />
+            </Link>
             {place.whatsapp ? (
               <a
                 className="btn wa"

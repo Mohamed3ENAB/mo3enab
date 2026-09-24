@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getProvider } from '@/lib/queries';
+import { getProvider, getReviews } from '@/lib/queries';
 import { SERVICE_LABELS } from '@/lib/types';
 import { sinceArabic, telHref } from '@/lib/format';
 import { Foot } from '@/components/Foot';
 import { Avatar } from '@/components/Avatar';
 import { FeedbackForms } from './forms';
+import { Reviews } from '@/components/Reviews';
 import { Check, Phone, Star, Pin, Home } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
   const { id } = await params;
   const p = await getProvider(id);
   if (!p) notFound();
+  const reviews = await getReviews({ providerId: id });
   const rating = Number(p.rating_count) > 0 ? p.rating_avg : null;
 
   return (
@@ -23,7 +25,7 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
       </Link>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 13, margin: '10px 0 18px' }}>
-        <Avatar name={p.display_name} verified={p.is_verified}>
+        <Avatar name={p.display_name} photoId={p.photo_id} verified={p.is_verified}>
           <Check size={12} />
         </Avatar>
         <div>
@@ -53,6 +55,9 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
       <a className="btn call wide" href={telHref(p.phone)} style={{ margin: '18px 0 26px' }}>
         <Phone /> اتصل بـ {p.display_name.split(' ')[0]}
       </a>
+
+      <h2>آراء الناس {rating ? `(${p.rating_count})` : ''}</h2>
+      <Reviews reviews={reviews} />
 
       <FeedbackForms providerId={p.id} name={p.display_name} />
       <Foot />

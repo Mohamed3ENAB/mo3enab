@@ -21,7 +21,7 @@ export function ProviderCard({ p, index = 0 }: { p: Provider; index?: number }) 
         className={`row rise${p.live ? ' live' : ''}`}
         style={{ animationDelay: `${Math.min(index, 8) * 55}ms` }}
       >
-        <Avatar name={p.display_name} verified={p.is_verified}>
+        <Avatar name={p.display_name} photoId={p.photo_id} verified={p.is_verified}>
           <Check size={12} />
         </Avatar>
 

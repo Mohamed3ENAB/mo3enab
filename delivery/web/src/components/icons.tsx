@@ -149,6 +149,33 @@ export const Logo = ({ size = 20, className }: P) => (
   </svg>
 );
 
+export const Camera = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M20.5 18.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V9.2a2 2 0 0 1 2-2h2.6l1.5-2.4h5.8l1.5 2.4h2.6a2 2 0 0 1 2 2Z" />
+    <circle cx="12" cy="13.4" r="3.4" />
+  </svg>
+);
+
+export const Send = ({ size = 20, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M21 3 10.5 13.5" /><path d="M21 3l-6.8 18-3.7-7.5L3 9.8Z" />
+  </svg>
+);
+
+export const Chat = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M20.5 12.6c0 4-3.8 7.2-8.5 7.2a9.8 9.8 0 0 1-2.6-.35L4 21.2l1.5-3.6A6.9 6.9 0 0 1 3.5 12.6c0-4 3.8-7.2 8.5-7.2s8.5 3.2 8.5 7.2Z" />
+  </svg>
+);
+
+export const UserPlus = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="9.5" cy="8" r="4" />
+    <path d="M2.5 20.5c0-3.6 3.1-6 7-6 1.3 0 2.5.3 3.5.8" />
+    <path d="M18 14v6M15 17h6" />
+  </svg>
+);
+
 /* ---- تصنيفات المحلات ---- */
 
 export const Restaurant = ({ size = 22, className }: P) => (

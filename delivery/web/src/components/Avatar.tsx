@@ -16,16 +16,40 @@ function hash(s: string) {
 
 export function Avatar({
   name,
+  photoId,
   verified,
+  size,
   children,
 }: {
   name: string;
+  photoId?: string | null;
   verified?: boolean;
+  size?: number;
   children?: React.ReactNode;
 }) {
   const initial = name.trim().charAt(0) || '؟';
+  const style = size ? { width: size, height: size, fontSize: size * 0.38 } : undefined;
+
+  // فيه صورة؟ اعرضها. مفيش؟ الحرف الأول على لون ثابت.
+  if (photoId) {
+    return (
+      <div className="avatar photo" style={style}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={`/img/${photoId}`} alt="" loading="lazy" decoding="async" />
+        {verified ? (
+          <span className="vbadge" title="موثّق">
+            {children}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
-    <div className="avatar" style={{ background: PALETTE[hash(name) % PALETTE.length] }}>
+    <div
+      className="avatar"
+      style={{ ...style, background: PALETTE[hash(name) % PALETTE.length] }}
+    >
       {initial}
       {verified ? (
         <span className="vbadge" title="موثّق">

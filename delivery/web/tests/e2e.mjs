@@ -9,6 +9,8 @@
  * محتاج قاعدة بيانات فيها بيانات الاختبار: npm run db:seed-demo
  */
 import { chromium } from 'playwright';
+import { writeFileSync, existsSync } from 'node:fs';
+import zlib from 'node:zlib';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:3000';
 const TOK = process.argv[3];
@@ -17,9 +19,42 @@ if (!TOK) {
   process.exit(1);
 }
 const ADMIN = process.env.ADMIN_PASSWORD || 'test-admin-pass';
+// صورة اختبار بتتعمل وقت التشغيل — مش متخزنة في الريبو
+const TEST_IMAGE = process.env.TEST_IMAGE || '/tmp/sekka-test.png';
 let pass = 0, fail = 0;
 const ok  = (m) => { pass++; console.log('✅ ' + m); };
 const bad = (m) => { fail++; console.log('❌ ' + m); };
+
+// صورة PNG صغيرة للاختبار
+function makeTestPng(path) {
+  if (existsSync(path)) return;
+  const w = 600, h = 600, rows = [];
+  for (let y = 0; y < h; y++) {
+    const row = Buffer.alloc(1 + w * 3);
+    for (let x = 0; x < w; x++) {
+      row[1 + x * 3] = (x * 255 / w) | 0;
+      row[2 + x * 3] = (y * 255 / h) | 0;
+      row[3 + x * 3] = 140;
+    }
+    rows.push(row);
+  }
+  const chunk = (type, data) => {
+    const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+    const body = Buffer.concat([Buffer.from(type), data]);
+    const crc = Buffer.alloc(4); crc.writeUInt32BE(zlib.crc32(body) >>> 0);
+    return Buffer.concat([len, body, crc]);
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4);
+  ihdr[8] = 8; ihdr[9] = 2;
+  writeFileSync(path, Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk('IHDR', ihdr),
+    chunk('IDAT', zlib.deflateSync(Buffer.concat(rows))),
+    chunk('IEND', Buffer.alloc(0)),
+  ]));
+}
+makeTestPng(TEST_IMAGE);
 
 const b = await chromium.launch();
 const settle = (pg, ms = 700) => pg.waitForTimeout(ms);
@@ -157,8 +192,8 @@ await p.waitForTimeout(1800);
 p.url().endsWith('/admin') ? ok('الإدارة دخلت') : bad(`مدخلتش: ${p.url()}`);
 
 // ١٢) الإيقاف بيخفي السائق فورًا
-await p.click('text=السواقين');
-await p.waitForTimeout(500);
+await p.locator('.tabs button:has-text("السواقين (")').first().click();
+await p.waitForTimeout(600);
 await p.locator('.admin-row').first().locator('button:has-text("أوقف")').click();
 await p.waitForTimeout(1500);
 const ctx2 = await b.newContext({ viewport: { width: 390, height: 844 } });
@@ -175,7 +210,7 @@ html.includes(TOK) ? bad('🔴 لينك سائق ظاهر للزائر') : ok('�
 // ١٤) إخفاء محل من الإدارة بيشيله من الدليل فورًا
 await p.goto(BASE + '/admin', { waitUntil: 'domcontentloaded' });
 await settle(p, 800);
-await p.locator('button:has-text("المحلات (")').first().click();
+await p.locator('.tabs button:has-text("المحلات (")').first().click();
 await settle(p, 600);
 await p.locator('.admin-row button:has-text("إخفاء")').first().click();
 await settle(p, 1400);
@@ -185,6 +220,137 @@ const placesAfterHide = await guest.locator('.row').count();
 placesAfterHide === placeCount - 1
   ? ok(`المحل المخفي اختفى فورًا (${placeCount} ← ${placesAfterHide})`)
   : bad(`متوقع ${placeCount - 1} محل، لقينا ${placesAfterHide}`);
+
+
+/* ===== الصور · التسجيل الذاتي · الريفيوز · المحادثة ===== */
+
+// ١) تسجيل ذاتي لسائق مع صورة
+await p.goto(BASE + '/join/apply?kind=driver', { waitUntil: 'domcontentloaded' });
+await settle(p, 1500);
+await p.setInputFiles('input[type=file]', TEST_IMAGE);
+await p.fill('input[name=name]', 'طارق المتقدم');
+await p.fill('input[name=phone]', '01099887766');
+await p.selectOption('select[name=zone_id]', { index: 1 });
+await p.locator('.checks input[value=bicycle]').check();
+await p.fill('input[name=vehicle_note]', 'عجلة');
+await p.locator('input[name=consent]').check();
+await p.click('button[type=submit]');
+await p.waitForSelector('text=طلبك وصلنا', { timeout: 10000 });
+ok('السائق سجّل نفسه ورفع صورة');
+
+// ٢) الطلب مش بيظهر في الدليل قبل الموافقة
+await p.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(p);
+const before = await p.locator('.row').count();
+(await p.content()).includes('طارق المتقدم')
+  ? bad('🔴 المتقدم ظهر في الدليل قبل الموافقة')
+  : ok(`الطلب مستني الموافقة ومش ظاهر في الدليل (${before} صف)`);
+
+// ٣) نفس الرقم مايبعتش طلب تاني
+await p.goto(BASE + '/join/apply?kind=driver', { waitUntil: 'domcontentloaded' });
+await settle(p, 1400);
+await p.fill('input[name=name]', 'طارق تاني');
+await p.fill('input[name=phone]', '01099887766');
+await p.selectOption('select[name=zone_id]', { index: 1 });
+await p.locator('.checks input[value=bicycle]').check();
+await p.locator('input[name=consent]').check();
+await p.click('button[type=submit]');
+await settle(p, 1500);
+(await p.locator('.msg.bad').count()) > 0
+  ? ok('الطلب المكرر بنفس الرقم اترفض')
+  : bad('الطلب المكرر عدّى');
+
+// ٤) الإدارة تقبل الطلب (الجلسة مفتوحة من قبل كده في السويت)
+await p.goto(BASE + '/admin', { waitUntil: 'domcontentloaded' });
+await settle(p, 1200);
+if (p.url().includes('/admin/login')) {
+  await p.fill('input[name=password]', ADMIN);
+  await p.click('button[type=submit]');
+  await settle(p, 2000);
+}
+await p.locator('.tabs button:has-text("طلبات الانضمام")').first().click();
+await settle(p, 700);
+const statPending = await p.locator('.stat').first().innerText();
+statPending.includes('1') ? ok('اللوحة بتعد الطلبات المستنية') : bad(`عداد غلط: ${statPending}`);
+await p.locator('button:has-text("اقبل وفعّل")').first().click();
+await settle(p, 2200);
+ok('الإدارة قبلت الطلب');
+
+// ٥) بقى ظاهر في الدليل + الصورة اتحفظت
+await p.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(p, 1200);
+const afterApproval = await p.content();
+afterApproval.includes('طارق المتقدم')
+  ? ok('المتقدم ظهر في الدليل بعد الموافقة')
+  : bad('مظهرش بعد الموافقة');
+const imgSrc = await p.locator('.avatar.photo img').first().getAttribute('src');
+if (imgSrc) {
+  const r = await p.request.get(BASE + imgSrc);
+  const len = Number(r.headers()['content-length'] ?? 0);
+  r.ok() && len > 0 && len < 40000
+    ? ok(`الصورة بتتقدّم مصغّرة (${len} بايت من 104233)`)
+    : bad(`الصورة: status ${r.status()} size ${len}`);
+  r.headers()['cache-control']?.includes('immutable')
+    ? ok('الصورة بتتكاش للأبد')
+    : bad('مفيش كاش على الصورة');
+} else bad('مفيش صورة في الدليل');
+
+// ٦) تقييم محل + الريفيو بيظهر
+await p.goto(BASE + '/places', { waitUntil: 'domcontentloaded' });
+await settle(p, 1400);
+await p.locator('a[href^="/m/"]').first().click();
+await p.waitForSelector('text=قيّم', { timeout: 8000 });
+await p.selectOption('select[name=stars]', '4');
+await p.fill('textarea[name=comment]', 'تعامل محترم والأسعار كويسة');
+await p.fill('input[name=author_name]', 'أم أحمد');
+await p.click('button:has-text("ابعت رأيك")');
+await settle(p, 2000);
+await p.reload({ waitUntil: 'domcontentloaded' });
+await settle(p, 1200);
+const rv = await p.content();
+rv.includes('تعامل محترم') && rv.includes('أم أحمد')
+  ? ok('الريفيو اتسجل وبيظهر بالاسم')
+  : bad('الريفيو مظهرش');
+
+// ٧) المحادثة: صاحب الطلب ينشر وياخد لينك
+await p.goto(BASE + '/requests', { waitUntil: 'domcontentloaded' });
+await settle(p, 1200);
+await p.fill('textarea[name=body]', 'محتاج حد يجيبلي عيش من الفرن');
+await p.fill('input[name=contact_phone]', '01234500011');
+await p.click('button[type=submit]');
+await p.waitForSelector('a[href^="/t/"]', { timeout: 9000 });
+const threadHref = await p.locator('a[href^="/t/"]').first().getAttribute('href');
+ok(`صاحب الطلب خد لينك محادثته (${threadHref})`);
+
+await p.goto(BASE + threadHref, { waitUntil: 'domcontentloaded' });
+await settle(p, 1200);
+await p.fill('textarea[name=body]', 'لو حد فاضي يكلمني');
+await p.click('button[type=submit]');
+await settle(p, 1800);
+(await p.locator('.bubble-msg').count()) > 0
+  ? ok('صاحب الطلب بعت رسالة')
+  : bad('الرسالة مبعتتش');
+
+// ٨) السائق يرد من لينكه
+const reqId = threadHref.split('/')[2];
+await p.goto(`${BASE}/d/${TOK}`, { waitUntil: 'domcontentloaded' });
+await settle(p, 1400);
+const replyLink = await p.locator('a[href^="/t/p/"]').first().getAttribute('href');
+if (!replyLink) { bad('السائق مش شايف زرار الرد'); }
+else {
+  await p.goto(BASE + replyLink, { waitUntil: 'domcontentloaded' });
+  await settle(p, 1200);
+  const seen = await p.locator('.bubble-msg').count();
+  seen > 0 ? ok(`السائق شايف رسالة صاحب الطلب (${seen})`) : bad('السائق مش شايف الرسايل');
+  await p.fill('textarea[name=body]', 'أنا جاي خلال ربع ساعة');
+  await p.click('button[type=submit]');
+  await settle(p, 1800);
+  (await p.locator('.bubble-msg').count()) > seen ? ok('السائق رد') : bad('رد السائق مظهرش');
+}
+
+// ٩) لينك محادثة غلط
+const r404 = await p.goto(BASE + '/t/not-a-real-token');
+r404.status() === 404 ? ok('لينك المحادثة الغلط بيرجع 404') : bad(`رجع ${r404.status()}`);
 
 await b.close();
 console.log(`\n${pass} عدّت · ${fail} فشلت`);

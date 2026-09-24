@@ -125,8 +125,8 @@ export function Places({
             </div>
             <h3>لسه مفيش محلات مضافة</h3>
             <p>تعرف محل أو مطعم بيوصّل؟ قولنا عليه ونضيفه.</p>
-            <Link className="btn call wide" href="/join">
-              ضيف محلك
+            <Link className="btn call wide" href="/join/apply?kind=place">
+              سجّل محلك
             </Link>
           </div>
         ) : (

@@ -4,7 +4,7 @@ import { SERVICE_LABELS } from '@/lib/types';
 import { money, waHref, telHref } from '@/lib/format';
 import { BottomNav } from '@/components/BottomNav';
 import { Foot } from '@/components/Foot';
-import { Bicycle, Phone, WhatsApp, Check, Info, SERVICE_ICON } from '@/components/icons';
+import { Bicycle, Phone, WhatsApp, Check, Info, UserPlus, SERVICE_ICON } from '@/components/icons';
 
 export const revalidate = 300;
 
@@ -125,16 +125,19 @@ export default async function JoinPage() {
           </div>
         </div>
 
+        <Link className="btn call wide" href="/join/apply?kind=driver" style={{ marginBottom: 10 }}>
+          <UserPlus size={19} /> سجّل نفسك كسائق
+        </Link>
         {phone ? (
           <>
             <a
-              className="btn call wide"
+              className="btn ghost wide"
               href={waHref(phone, msg)}
               target="_blank"
               rel="noreferrer"
               style={{ marginBottom: 10 }}
             >
-              <WhatsApp /> ابعتلنا واتساب
+              <WhatsApp /> أو ابعتلنا واتساب
             </a>
             <a className="btn ghost wide" href={telHref(phone)}>
               <Phone /> اتصل بينا
@@ -144,10 +147,13 @@ export default async function JoinPage() {
 
         <h2>عندك محل أو مطعم؟</h2>
         <div className="card">
-          <p className="lede" style={{ margin: 0 }}>
+          <p className="lede" style={{ marginTop: 0 }}>
             نضيف اسم محلك ورقمك في <Link href="/places" style={{ fontWeight: 800 }}>دليل المحلات</Link>{' '}
-            ببلاش، والناس تطلب منك مباشرة. كلّمنا على نفس الرقم.
+            ببلاش، والناس تطلب منك مباشرة.
           </p>
+          <Link className="btn ghost wide" href="/join/apply?kind=place">
+            سجّل محلك
+          </Link>
         </div>
 
         <Foot />

@@ -2,21 +2,43 @@
 
 import { useState, useTransition } from 'react';
 import { postRequest } from '@/app/actions';
+import Link from 'next/link';
 import { SERVICE_LABELS, SERVICE_ORDER, type Zone } from '@/lib/types';
+import { Chat, Alert } from '@/components/icons';
 
 export function RequestForm({ zones }: { zones: Zone[] }) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [thread, setThread] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   function onSubmit(formData: FormData) {
     start(async () => {
       const res = await postRequest(formData);
-      setMsg(
-        res.ok
-          ? { ok: true, text: 'اتنشر. السواقين هيشوفوه دلوقتي.' }
-          : { ok: false, text: res.message ?? 'مقدرناش ننشر الطلب. جرّب تاني.' }
-      );
+      if (res.ok) {
+        setMsg({ ok: true, text: 'اتنشر. السواقين هيشوفوه دلوقتي.' });
+        setThread(res.threadToken ?? null);
+      } else {
+        setMsg({ ok: false, text: res.message ?? 'مقدرناش ننشر الطلب. جرّب تاني.' });
+      }
     });
+  }
+
+  if (thread) {
+    return (
+      <div>
+        <p className="msg ok">طلبك اتنشر.</p>
+        <Link className="btn call wide" href={`/t/${thread}`} style={{ marginBottom: 12 }}>
+          <Chat size={19} /> افتح محادثة طلبك
+        </Link>
+        <div className="note warn">
+          <Alert className="ic" />
+          <span>
+            <strong>احفظ اللينك ده.</strong> ده الطريقة الوحيدة ترجع للمحادثة، وأي حد معاه
+            يقدر يقراها ويرد باسمك.
+          </span>
+        </div>
+      </div>
+    );
   }
 
   return (
