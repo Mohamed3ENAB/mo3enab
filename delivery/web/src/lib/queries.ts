@@ -70,7 +70,12 @@ export async function getProviderByToken(token: string) {
 export async function getOpenRequests(): Promise<OpenRequest[]> {
   return q<OpenRequest>(
     `select r.id, z.name_ar as zone_name, r.kind, r.body,
-            r.contact_phone, r.created_at, r.expires_at
+            -- 🔴 لو مخفي، الرقم مبيتبعتش للواجهة أصلًا. القناع بيتعمل هنا.
+            case when r.hide_phone then null else r.contact_phone end as contact_phone,
+            case when r.hide_phone
+                 then left(r.contact_phone, 4) || '••••' || right(r.contact_phone, 2)
+                 else null end as masked_phone,
+            r.hide_phone, r.created_at, r.expires_at
        from requests r
        left join service_zones z on z.id = r.zone_id
       where not r.is_hidden and r.expires_at > now()
@@ -206,11 +211,12 @@ export async function adminListRequests() {
     id: string;
     body: string;
     contact_phone: string;
+    hide_phone: boolean;
     is_hidden: boolean;
     created_at: string;
     expires_at: string;
   }>(
-    `select id, body, contact_phone, is_hidden, created_at, expires_at
+    `select id, body, contact_phone, hide_phone, is_hidden, created_at, expires_at
        from requests order by created_at desc limit 50`
   );
 }

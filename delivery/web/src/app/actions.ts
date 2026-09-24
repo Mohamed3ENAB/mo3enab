@@ -64,10 +64,12 @@ export async function postRequest(formData: FormData): Promise<Result> {
   const kind = SERVICE_KINDS.includes(kindRaw as ServiceKind) ? kindRaw : null;
   const zoneId = /^\d+$/.test(zoneRaw) ? Number(zoneRaw) : null;
 
+  const hidePhone = Boolean(formData.get('hide_phone'));
+
   const row = await q1<{ id: string }>(
-    `insert into requests (zone_id, kind, body, contact_phone)
-     values ($1, $2::service_kind, $3, $4) returning id`,
-    [zoneId, kind, body, phone.replace(/\s/g, '')]
+    `insert into requests (zone_id, kind, body, contact_phone, hide_phone)
+     values ($1, $2::service_kind, $3, $4, $5) returning id`,
+    [zoneId, kind, body, phone.replace(/\s/g, ''), hidePhone]
   );
 
   // التريجر بيعمل خيط المحادثة تلقائيًا؛ نرجّع لينكه لصاحب الطلب

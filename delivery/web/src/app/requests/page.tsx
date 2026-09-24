@@ -3,7 +3,7 @@ import { SERVICE_LABELS } from '@/lib/types';
 import { sinceArabic, telHref } from '@/lib/format';
 import { BottomNav } from '@/components/BottomNav';
 import { RequestForm } from './form';
-import { Phone, Clock, Pin, Info, Board } from '@/components/icons';
+import { Phone, Clock, Pin, Info, Board, Shield } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,9 +49,20 @@ export default async function RequestsPage() {
                 {r.kind ? <span className="pill info">{SERVICE_LABELS[r.kind]}</span> : null}
                 <Clock size={13} /> {sinceArabic(r.created_at)}
               </div>
-              <a className="btn ghost wide" href={telHref(r.contact_phone)} style={{ marginTop: 12 }}>
-                <Phone /> اتصل بصاحب الطلب
-              </a>
+              {r.contact_phone ? (
+                <a className="btn ghost wide" href={telHref(r.contact_phone)} style={{ marginTop: 12 }}>
+                  <Phone /> اتصل بصاحب الطلب
+                </a>
+              ) : (
+                <div style={{ marginTop: 12 }}>
+                  <p className="when" style={{ marginBottom: 8 }}>
+                    <Shield size={14} /> {r.masked_phone} — صاحب الطلب مخفي رقمه
+                  </p>
+                  <p className="lede" style={{ margin: 0, fontSize: 14 }}>
+                    لو انت سائق، افتح لينكك الخاص وهتلاقي زرار الرد على الطلب ده.
+                  </p>
+                </div>
+              )}
             </div>
           ))
         )}

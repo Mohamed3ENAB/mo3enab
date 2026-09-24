@@ -41,7 +41,10 @@ export type OpenRequest = {
   zone_name: string | null;
   kind: ServiceKind | null;
   body: string;
-  contact_phone: string;
+  /** null لما صاحب الطلب يخفي رقمه — الرقم الحقيقي مبيخرجش من السيرفر أصلًا */
+  contact_phone: string | null;
+  masked_phone: string | null;
+  hide_phone: boolean;
   created_at: string;
   expires_at: string;
 };

@@ -23,7 +23,10 @@ type R = {
   id: string; provider_name: string; reasonLabel: string; details: string | null;
   reporter_phone: string | null; since: string; handled_at: string | null;
 };
-type Q = { id: string; body: string; contact_phone: string; is_hidden: boolean; since: string };
+type Q = {
+  id: string; body: string; contact_phone: string;
+  hide_phone: boolean; is_hidden: boolean; since: string;
+};
 type A = {
   id: string; kind: 'driver' | 'place'; status: string; name: string; phone: string;
   whatsapp: string | null; zone_name: string; note: string | null; photo_id: string | null;
@@ -229,7 +232,10 @@ export function AdminPanel({
                 {q.body.slice(0, 80)}{q.body.length > 80 ? '…' : ''}{' '}
                 {q.is_hidden ? <span className="pill warn">مخفي</span> : null}
               </div>
-              <div className="sub">{q.contact_phone} · {q.since}</div>
+              <div className="sub">
+                {q.contact_phone} · {q.since}
+                {q.hide_phone ? <span className="pill info">الرقم مخفي</span> : null}
+              </div>
             </div>
             <div className="actions">
               <button className="btn quiet" disabled={pending}

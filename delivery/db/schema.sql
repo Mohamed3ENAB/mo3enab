@@ -124,6 +124,8 @@ create table requests (
   kind        service_kind,
   body        text not null check (length(btrim(body)) between 5 and 500),
   contact_phone text not null,
+  -- صاحب الطلب يقدر يخفي رقمه ويخلي التواصل من جوه التطبيق
+  hide_phone  boolean not null default false,
   is_hidden   boolean not null default false,   -- الإدارة تخفي المسيء
   expires_at  timestamptz not null default now() + interval '6 hours',
   created_at  timestamptz not null default now()

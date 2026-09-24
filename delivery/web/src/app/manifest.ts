@@ -11,6 +11,12 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#00A86B',
     lang: 'ar',
     dir: 'rtl',
-    icons: [{ src: '/icon.svg', sizes: 'any', type: 'image/svg+xml' }],
+    icons: [
+      { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml' },
+      { src: '/icons/icon-192.webp', sizes: '192x192', type: 'image/webp' },
+      { src: '/icons/icon-512.webp', sizes: '512x512', type: 'image/webp' },
+      // maskable عشان أندرويد يقص الأيقونة صح على الشاشة
+      { src: '/icons/icon-512.webp', sizes: '512x512', type: 'image/webp', purpose: 'maskable' },
+    ],
   };
 }

@@ -352,6 +352,46 @@ else {
 const r404 = await p.goto(BASE + '/t/not-a-real-token');
 r404.status() === 404 ? ok('لينك المحادثة الغلط بيرجع 404') : bad(`رجع ${r404.status()}`);
 
+
+/* ===== خصوصية رقم صاحب الطلب ===== */
+
+// ١) الإخفاء هو الافتراضي
+await p.goto(BASE+'/requests',{waitUntil:'domcontentloaded'}); await settle(p, 1400);
+(await p.locator('input[name=hide_phone]').isChecked())
+  ? ok('إخفاء الرقم شغّال افتراضيًا') : bad('الإخفاء مش افتراضي');
+
+// ٢) طلب برقم مخفي
+await p.fill('textarea[name=body]','محتاج حد يجيبلي دوا من الصيدلية');
+await p.fill('input[name=contact_phone]','01277889900');
+await p.click('button[type=submit]');
+await p.waitForSelector('a[href^="/t/"]',{timeout:9000});
+ok('الطلب اتنشر برقم مخفي');
+
+// ٣) الرقم الحقيقي مش موجود في صفحة الطلبات خالص
+
+await guest.goto(BASE+'/requests',{waitUntil:'domcontentloaded'}); await settle(guest, 1300);
+const boardHtml = await guest.content();
+boardHtml.includes('01277889900')
+  ? bad('🔴 الرقم الحقيقي ظاهر في الصفحة')
+  : ok('الرقم الحقيقي مش موجود في HTML الصفحة خالص');
+boardHtml.includes('0127••••00')
+  ? ok('الرقم بيظهر ناقص 0127••••00')
+  : bad('القناع مش ظاهر');
+(await guest.locator('a[href^="tel:0127"]').count()) === 0
+  ? ok('مفيش زرار اتصال للطلب المخفي') : bad('زرار الاتصال لسه موجود');
+
+// ٤) طلب برقم ظاهر لسه بيشتغل عادي
+await p.goto(BASE+'/requests',{waitUntil:'domcontentloaded'}); await settle(p, 1400);
+await p.fill('textarea[name=body]','محتاج توصيلة للمحلة وممكن حد يكلمني عادي');
+await p.fill('input[name=contact_phone]','01255443322');
+await p.locator('input[name=hide_phone]').uncheck();
+await p.click('button[type=submit]');
+await p.waitForSelector('a[href^="/t/"]',{timeout:9000});
+await guest.goto(BASE+'/requests',{waitUntil:'domcontentloaded'}); await settle(guest, 1300);
+(await guest.locator('a[href="tel:01255443322"]').count()) > 0
+  ? ok('اللي اختار يظهر رقمه، رقمه ظاهر وزرار الاتصال شغال')
+  : bad('الرقم الظاهر مبقاش شغال');
+
 await b.close();
 console.log(`\n${pass} عدّت · ${fail} فشلت`);
 process.exit(fail > 0 ? 1 : 0);
