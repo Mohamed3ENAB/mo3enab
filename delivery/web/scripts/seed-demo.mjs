@@ -50,3 +50,33 @@ for (const [name, phone, wa, zone, svc, veh, note, ver, av, mins] of demo) {
 }
 await c.end();
 console.log('\nالبيانات التجريبية جاهزة. اللينكات فوق للاختبار.');
+
+// ---- محلات ومطاعم تجريبية ----
+const demoPlaces = [
+  ['مطعم الشرقاوي',      'restaurant',  'القيصرية',     '01055550001', '01055550001', 'شارع الجامع الكبير', 'من 12ظ لـ 1 بالليل', 'فراخ ولحمة مشوية'],
+  ['كشري أم محمد',        'restaurant',  'القيصرية',     '01055550002', null,          'أول شارع المحطة',    'من 11ص لـ 11م',      null],
+  ['سوبر ماركت النور',    'supermarket', 'القيصرية',     '01055550003', '01055550003', 'قدام الوحدة الصحية', 'من 8ص لـ 12م',       'بيوصّل بنفسه أحيانًا'],
+  ['بقالة الحاج سيد',      'grocery',     'بطينة',        '01055550004', null,          'وسط البلد',          'من 7ص لـ 11م',       null],
+  ['عطارة الشفاء',        'herbalist',   'القيصرية',     '01055550005', '01055550005', 'جنب مسجد النصر',     'من 9ص لـ 10م',       'أعشاب وتوابل'],
+  ['مكتبة الأمل',         'stationery',  'القيصرية',     '01055550006', null,          'شارع المدرسة',       'من 8ص لـ 9م',        'أدوات مدرسية وتصوير'],
+  ['صيدلية د. هالة',      'pharmacy',    'القيصرية',     '01055550007', '01055550007', 'ميدان البلد',        '24 ساعة',            null],
+  ['فرن البركة',          'bakery',      'محلة أبو علي', '01055550008', null,          'أول الطريق',         'من 5ص لـ 2ظ',        null],
+  ['خضار وفاكهة الجمل',   'produce',     'القيصرية',     '01055550009', null,          'السوق',              'من 6ص لـ 8م',        null],
+  ['جزارة الأمانة',       'butcher',     'بطينة',        '01055550010', '01055550010', 'جنب البقالة',        'من 9ص لـ 9م',        null],
+];
+
+const c2 = new pg.Client({
+  connectionString: url,
+  ssl: /supabase|sslmode=require|neon\.tech/i.test(url) ? { rejectUnauthorized: false } : undefined,
+});
+await c2.connect();
+for (const [name, cat, zone, phone, wa, addr, hours, note] of demoPlaces) {
+  await c2.query(
+    `insert into places (name_ar, category, zone_id, phone, whatsapp, address_note, hours_note, note)
+     select $1, $2::place_category, z.id, $3, $4, $5, $6, $7
+       from service_zones z where z.name_ar = $8`,
+    [name, cat, phone, wa, addr, hours, note, zone]
+  );
+}
+await c2.end();
+console.log(`${demoPlaces.length} محل تجريبي اتضافوا.`);

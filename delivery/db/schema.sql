@@ -23,6 +23,22 @@ create type service_kind as enum (
   'mahalla_run'    -- مشاوير المحلة الكبرى
 );
 
+create type place_category as enum (
+  'restaurant',   -- مطاعم
+  'supermarket',  -- سوبر ماركت
+  'grocery',      -- بقالة
+  'herbalist',    -- عطار
+  'bakery',       -- مخبز
+  'butcher',      -- جزارة
+  'produce',      -- خضار وفاكهة
+  'pharmacy',     -- صيدلية
+  'stationery',   -- مكتبة
+  'sweets',       -- حلويات
+  'hardware',     -- أدوات ومستلزمات
+  'phones',       -- موبايلات
+  'other'         -- غير كده
+);
+
 create type report_reason as enum (
   'rude','overcharge','no_show','unsafe','wrong_number','other'
 );
@@ -140,7 +156,45 @@ create table reports (
 );
 
 -- ------------------------------------------------------------
--- ٨) الأسعار الاسترشادية — حماية للناس، مش تسعيرة ملزمة
+-- ٨) المحلات والمطاعم
+--    دليل تاني جنب دليل السواقين: تكلّم المحل وتطلب، وبعدين
+--    تكلّم سائق متاح يروح يستلم منه.
+--    الأرقام دي أرقام أنشطة تجارية (معلنة على اللافتة عادة)،
+--    مش أرقام شخصية — بس برضه استأذن صاحب المحل.
+-- ------------------------------------------------------------
+create table places (
+  id            uuid primary key default gen_random_uuid(),
+  name_ar       text not null,
+  category      place_category not null,
+  zone_id       int not null references service_zones(id),
+  phone         text,
+  whatsapp      text,
+  address_note  text,                 -- 'جنب الجامع الكبير'
+  hours_note    text,                 -- 'من 10ص لـ 12 بالليل'
+  note          text,
+  is_active     boolean not null default true,
+  sort_order    int not null default 0,
+  created_at    timestamptz not null default now(),
+  constraint places_need_contact check (phone is not null or whatsapp is not null)
+);
+create index on places (category) where is_active;
+create index on places (zone_id) where is_active;
+
+-- ------------------------------------------------------------
+-- ٩) سعر البداية لكل مركبة
+--    «العجلة تبدأ من ٥ ج» — بيخلي الدخول سهل للشباب اللي عندهم
+--    عجلة بس، والطلبات القريبة تبقى مجدية للطرفين.
+-- ------------------------------------------------------------
+create table vehicle_rates (
+  kind        service_kind primary key,
+  starts_from numeric(10,2) not null,
+  note_ar     text,
+  is_active   boolean not null default true,
+  sort_order  int not null default 0
+);
+
+-- ------------------------------------------------------------
+-- ١٠) الأسعار الاسترشادية — حماية للناس، مش تسعيرة ملزمة
 -- ------------------------------------------------------------
 create table price_guide (
   id           serial primary key,
@@ -154,13 +208,13 @@ create table price_guide (
 );
 
 -- ------------------------------------------------------------
--- ٩) الإدارة
+-- ١١) الإدارة
 --    مفيش جدول مستخدمين. لوحة الإدارة بتتحمي بكلمة سر في متغير بيئة
 --    (ADMIN_PASSWORD) والتحقق بيحصل في السيرفر. أبسط حاجة تأمّن الغرض.
 -- ------------------------------------------------------------
 
 -- ------------------------------------------------------------
--- ١٠) العرض العام — الأعمدة الآمنة فقط، بدون توكن
+-- ١٢) العرض العام — الأعمدة الآمنة فقط، بدون توكن
 -- ------------------------------------------------------------
 create view providers_public as
   select
@@ -173,7 +227,7 @@ create view providers_public as
   where p.is_active;
 
 -- ------------------------------------------------------------
--- ١١) تبديل التوفر باللينك الخاص — من غير تسجيل دخول
+-- ١٣) تبديل التوفر باللينك الخاص — من غير تسجيل دخول
 -- ------------------------------------------------------------
 create or replace function toggle_availability(p_token text, p_available boolean)
 returns table (name text, available boolean, updated_at timestamptz)

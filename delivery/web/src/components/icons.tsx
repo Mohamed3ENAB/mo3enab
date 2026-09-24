@@ -149,6 +149,114 @@ export const Logo = ({ size = 20, className }: P) => (
   </svg>
 );
 
+/* ---- تصنيفات المحلات ---- */
+
+export const Restaurant = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M6 3v7a2.5 2.5 0 0 0 5 0V3" /><path d="M8.5 10.5V21" />
+    <path d="M17.5 3c-1.4 1.4-2 3.3-2 5.2 0 1.6.7 2.8 2 3.3V21" />
+  </svg>
+);
+
+export const Cart = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="9.5" cy="19.5" r="1.6" /><circle cx="17.5" cy="19.5" r="1.6" />
+    <path d="M2.5 3h2.6l2.4 12.2a1.6 1.6 0 0 0 1.6 1.3h8.4a1.6 1.6 0 0 0 1.6-1.3l1.4-7.4H6" />
+  </svg>
+);
+
+export const Store = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M3.5 9.5V20a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1V9.5" />
+    <path d="M2.5 9.5 4.4 4.2A1.6 1.6 0 0 1 5.9 3h12.2a1.6 1.6 0 0 1 1.5 1.2l1.9 5.3a3 3 0 0 1-5.7 1.3 3 3 0 0 1-5.6 0 3 3 0 0 1-5.7-1.3Z" />
+    <path d="M9.5 21v-5.5h5V21" />
+  </svg>
+);
+
+export const Herb = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M12 21V11" />
+    <path d="M12 11c0-4 2.6-7.4 6.4-8.2C19 6.8 16.6 11 12 11Z" />
+    <path d="M12 15c-3.4 0-5.8-2.4-6.2-5.6C8.9 10 12 12 12 15Z" />
+  </svg>
+);
+
+export const Bread = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M4 10.5C4 7.5 7.6 5.5 12 5.5s8 2 8 5c0 1.4-1.1 2.2-2.2 2.2V19a1 1 0 0 1-1 1H7.2a1 1 0 0 1-1-1v-6.3C5.1 12.7 4 11.9 4 10.5Z" />
+    <path d="M9 9.2v3.2M15 9.2v3.2" />
+  </svg>
+);
+
+export const Meat = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M7.6 20.4a5.5 5.5 0 0 1-3.6-8.6l7-8.5a4.6 4.6 0 0 1 7.6 5l-1.4 2.3" />
+    <path d="M13.5 20.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" /><path d="M13.5 17v0" />
+  </svg>
+);
+
+export const Produce = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M12 8.5c-3.6-2.7-8 0-8 4.6 0 3.6 3 7.4 5.6 7.4 1 0 1.6-.5 2.4-.5s1.4.5 2.4.5c2.6 0 5.6-3.8 5.6-7.4 0-4.6-4.4-7.3-8-4.6Z" />
+    <path d="M12 8.5V5.2M12 5.2c2.2 0 3-1.4 3-2.7-1.8 0-3 1-3 2.7Z" />
+  </svg>
+);
+
+export const Pharmacy = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <rect x="3" y="3.5" width="18" height="17" rx="4" />
+    <path d="M12 8v8M8 12h8" />
+  </svg>
+);
+
+export const Book = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M4 4.5A2 2 0 0 1 6 2.5h13v16H6a2 2 0 0 0-2 2Z" /><path d="M4 18.5V21h15" />
+    <path d="M8.5 7h6" />
+  </svg>
+);
+
+export const Sweets = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M4 20.5h16v-5.8a8 8 0 0 0-16 0Z" /><path d="M2.5 20.5h19" />
+    <path d="M12 6.7V4.4M12 4.4c1.4 0 2-.9 2-1.9-1.2 0-2 .7-2 1.9Z" />
+  </svg>
+);
+
+export const Tools = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <path d="M14.2 6.2a4 4 0 0 1 5.4-5.4l-3 3 2.6 2.6 3-3a4 4 0 0 1-5.4 5.4L6.4 19.2a2.3 2.3 0 0 1-3.3-3.3Z" />
+  </svg>
+);
+
+export const Mobile = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <rect x="6" y="2.5" width="12" height="19" rx="3" /><path d="M10.5 18.3h3" />
+  </svg>
+);
+
+export const Dots = ({ size = 22, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="12" cy="12" r="9" /><path d="M8.2 12v0M12 12v0M15.8 12v0" />
+  </svg>
+);
+
+export const PLACE_ICON = {
+  restaurant: Restaurant,
+  supermarket: Cart,
+  grocery: Store,
+  herbalist: Herb,
+  bakery: Bread,
+  butcher: Meat,
+  produce: Produce,
+  pharmacy: Pharmacy,
+  stationery: Book,
+  sweets: Sweets,
+  hardware: Tools,
+  phones: Mobile,
+  other: Dots,
+} as const;
+
 /* الأيقونة المناسبة لكل خدمة */
 export const SERVICE_ICON = {
   delivery: Motorcycle,

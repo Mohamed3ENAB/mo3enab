@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { Home, Board, Money, Shield } from './icons';
+import { Home, Store, Board, Money } from './icons';
 
+// الإدارة مش هنا عن قصد — الناس العادية مش محتاجاها. اللينك في التذييل.
 const ITEMS = [
-  { href: '/', label: 'الدليل', Icon: Home, key: 'home' },
+  { href: '/', label: 'السواقين', Icon: Home, key: 'home' },
+  { href: '/places', label: 'المحلات', Icon: Store, key: 'places' },
   { href: '/requests', label: 'الطلبات', Icon: Board, key: 'requests' },
   { href: '/prices', label: 'الأسعار', Icon: Money, key: 'prices' },
-  { href: '/admin', label: 'الإدارة', Icon: Shield, key: 'admin' },
 ] as const;
 
 export function BottomNav({ current }: { current?: string }) {

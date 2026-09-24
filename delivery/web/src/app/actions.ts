@@ -10,6 +10,10 @@ const SERVICE_KINDS: ServiceKind[] = [
   'delivery', 'tuktuk', 'goods', 'bicycle', 'mahalla_run',
 ];
 const REASONS = ['rude', 'overcharge', 'no_show', 'unsafe', 'wrong_number', 'other'];
+const PLACE_CATEGORIES = [
+  'restaurant', 'supermarket', 'grocery', 'herbalist', 'bakery', 'butcher',
+  'produce', 'pharmacy', 'stationery', 'sweets', 'hardware', 'phones', 'other',
+];
 
 type Result = { ok: boolean; message?: string };
 
@@ -181,4 +185,47 @@ export async function handleReport(id: string) {
   await requireAdmin();
   await q(`update reports set handled_at = now() where id = $1`, [id]);
   revalidatePath('/admin');
+}
+
+/* ---------------- الإدارة: المحلات ---------------- */
+
+export async function addPlace(formData: FormData): Promise<Result> {
+  await requireAdmin();
+  const name = str(formData.get('name_ar'), 80);
+  const category = str(formData.get('category'), 20);
+  const zoneId = Number(str(formData.get('zone_id'), 10));
+  const phone = str(formData.get('phone'), 20).replace(/\s/g, '');
+  const whatsapp = str(formData.get('whatsapp'), 20).replace(/\s/g, '');
+  const address = str(formData.get('address_note'), 120);
+  const hours = str(formData.get('hours_note'), 60);
+  const note = str(formData.get('note'), 120);
+
+  if (name.length < 2) return { ok: false, message: 'اكتب اسم المحل.' };
+  if (!PLACE_CATEGORIES.includes(category)) return { ok: false, message: 'اختار التصنيف.' };
+  if (!Number.isInteger(zoneId)) return { ok: false, message: 'اختار القرية.' };
+
+  const phoneOk = /^0\d{8,10}$/.test(phone);
+  const waOk = /^0\d{9,10}$/.test(whatsapp);
+  if (!phoneOk && !waOk)
+    return { ok: false, message: 'لازم رقم تليفون أو واتساب صح على الأقل.' };
+  if (phone && !phoneOk) return { ok: false, message: 'رقم التليفون مش صح.' };
+  if (whatsapp && !waOk) return { ok: false, message: 'رقم الواتساب مش صح.' };
+
+  await q(
+    `insert into places (name_ar, category, zone_id, phone, whatsapp, address_note, hours_note, note)
+     values ($1, $2::place_category, $3, nullif($4,''), nullif($5,''),
+             nullif($6,''), nullif($7,''), nullif($8,''))`,
+    [name, category, zoneId, phone, whatsapp, address, hours, note]
+  );
+
+  revalidatePath('/admin');
+  revalidatePath('/places');
+  return { ok: true };
+}
+
+export async function setPlaceActive(id: string, active: boolean) {
+  await requireAdmin();
+  await q(`update places set is_active = $2 where id = $1`, [id, active]);
+  revalidatePath('/admin');
+  revalidatePath('/places');
 }

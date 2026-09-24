@@ -99,25 +99,64 @@ await p.waitForTimeout(1200);
 const badMsg = await p.locator('.msg.bad').count();
 badMsg > 0 ? ok('الرقم الغلط اترفض برسالة واضحة') : bad('الرقم الغلط عدّى');
 
-// ٨) /admin يرمي على تسجيل الدخول
+// ٨) دليل المحلات بيشتغل من غير تسجيل
+await p.goto(BASE + '/places', { waitUntil: 'domcontentloaded' });
+await settle(p, 1200);
+const placeCount = await p.locator('.row').count();
+placeCount > 0 ? ok(`دليل المحلات شغال بدون تسجيل (${placeCount} محل)`) : bad('مفيش محلات ظاهرة');
+
+// ٨ب) فلتر التصنيف
+const beforeCat = await p.locator('.row').count();
+await p.locator('.svc[aria-pressed="false"]').first().click();
+await settle(p, 500);
+const afterCat = await p.locator('.row').count();
+afterCat < beforeCat ? ok(`فلتر التصنيف بيصفّي (${beforeCat} ← ${afterCat})`) : bad('فلتر التصنيف مبيعملش حاجة');
+
+// ٨ج) ورقة «اطلب من هنا»: خطوتين + سواقين متاحين + رسالة جاهزة
+await p.goto(BASE + '/places', { waitUntil: 'domcontentloaded' });
+await settle(p, 1400);
+await p.locator('button:has-text("اطلب من هنا")').first().click();
+await p.waitForSelector('.sheet', { timeout: 6000 });
+const steps = await p.locator('.sheet .step').count();
+const sheetDrivers = await p.locator('.sheet .mini').count();
+steps === 2 ? ok('ورقة الطلب فيها الخطوتين') : bad(`متوقع خطوتين، لقينا ${steps}`);
+sheetDrivers > 0 ? ok(`الورقة بتعرض ${sheetDrivers} سواقين متاحين`) : bad('الورقة مش بتعرض سواقين');
+
+const waLink = await p.locator('.sheet .mini a[href*="wa.me"]').first().getAttribute('href');
+const decoded = decodeURIComponent(waLink ?? '');
+decoded.includes('ممكن تستلملي طلب من')
+  ? ok('رسالة الاستلام بتتكتب لوحدها باسم المحل')
+  : bad(`رسالة الواتساب مش مظبوطة: ${decoded.slice(0, 80)}`);
+
+// ٨د) سعر البداية للعجلة ظاهر في الأسعار وفي صفحة الانضمام
+for (const [path, label] of [['/prices', 'الأسعار'], ['/join', 'اشتغل معانا']]) {
+  await p.goto(BASE + path, { waitUntil: 'domcontentloaded' });
+  await settle(p, 600);
+  const txt = await p.locator('.rates').first().innerText();
+  txt.includes('عجلة') && txt.includes('5')
+    ? ok(`سعر بداية العجلة ظاهر في ${label}`)
+    : bad(`سعر بداية العجلة مش ظاهر في ${label}: ${txt.slice(0, 60)}`);
+}
+
+// ٩) /admin يرمي على تسجيل الدخول
 await p.goto(BASE + '/admin', { waitUntil: 'domcontentloaded' });
 await settle(p);
 p.url().includes('/admin/login') ? ok('/admin محمية — بترمي على الدخول') : bad(`مرماش: ${p.url()}`);
 
-// ٩) كلمة سر غلط
+// ١٠) كلمة سر غلط
 await p.fill('input[name="password"]', 'wrong-password');
 await p.click('button[type="submit"]');
 await p.waitForTimeout(1200);
 const loginErr = await p.locator('.msg.bad').count();
 loginErr > 0 && !p.url().endsWith('/admin') ? ok('كلمة السر الغلط اترفضت') : bad('كلمة السر الغلط عدّت');
 
-// ١٠) كلمة السر الصح
+// ١١) كلمة السر الصح
 await p.fill('input[name="password"]', ADMIN);
 await p.click('button[type="submit"]');
 await p.waitForTimeout(1800);
 p.url().endsWith('/admin') ? ok('الإدارة دخلت') : bad(`مدخلتش: ${p.url()}`);
 
-// ١١) الإيقاف بيخفي السائق فورًا
+// ١٢) الإيقاف بيخفي السائق فورًا
 await p.click('text=السواقين');
 await p.waitForTimeout(500);
 await p.locator('.admin-row').first().locator('button:has-text("أوقف")').click();
@@ -129,9 +168,23 @@ await settle(guest);
 const afterSuspend = await guest.locator('.row').count();
 afterSuspend === 5 ? ok(`السائق الموقوف اختفى من الدليل فورًا (6 ← ${afterSuspend})`) : bad(`متوقع 5 صفوف، لقينا ${afterSuspend}`);
 
-// ١٢) الزائر مش شايف لينكات السواقين في أي صفحة
+// ١٣) الزائر مش شايف لينكات السواقين في أي صفحة
 const html = await guest.content();
 html.includes(TOK) ? bad('🔴 لينك سائق ظاهر للزائر') : ok('لينكات السواقين مش ظاهرة للزائر');
+
+// ١٤) إخفاء محل من الإدارة بيشيله من الدليل فورًا
+await p.goto(BASE + '/admin', { waitUntil: 'domcontentloaded' });
+await settle(p, 800);
+await p.locator('button:has-text("المحلات (")').first().click();
+await settle(p, 600);
+await p.locator('.admin-row button:has-text("إخفاء")').first().click();
+await settle(p, 1400);
+await guest.goto(BASE + '/places', { waitUntil: 'domcontentloaded' });
+await settle(guest, 1000);
+const placesAfterHide = await guest.locator('.row').count();
+placesAfterHide === placeCount - 1
+  ? ok(`المحل المخفي اختفى فورًا (${placeCount} ← ${placesAfterHide})`)
+  : bad(`متوقع ${placeCount - 1} محل، لقينا ${placesAfterHide}`);
 
 await b.close();
 console.log(`\n${pass} عدّت · ${fail} فشلت`);

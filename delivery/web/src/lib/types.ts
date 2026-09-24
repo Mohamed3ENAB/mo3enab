@@ -64,3 +64,52 @@ export const REPORT_REASONS = {
 } as const;
 
 export type ReportReason = keyof typeof REPORT_REASONS;
+
+/* ---------------- المحلات ---------------- */
+
+export type PlaceCategory =
+  | 'restaurant' | 'supermarket' | 'grocery' | 'herbalist' | 'bakery'
+  | 'butcher' | 'produce' | 'pharmacy' | 'stationery' | 'sweets'
+  | 'hardware' | 'phones' | 'other';
+
+export const PLACE_LABELS: Record<PlaceCategory, string> = {
+  restaurant: 'مطاعم',
+  supermarket: 'سوبر ماركت',
+  grocery: 'بقالة',
+  herbalist: 'عطارة',
+  bakery: 'مخبز',
+  butcher: 'جزارة',
+  produce: 'خضار وفاكهة',
+  pharmacy: 'صيدلية',
+  stationery: 'مكتبة',
+  sweets: 'حلويات',
+  hardware: 'أدوات ومستلزمات',
+  phones: 'موبايلات',
+  other: 'غير كده',
+};
+
+/** ترتيب العرض: اللي بيتطلب أكتر الأول. */
+export const PLACE_ORDER: PlaceCategory[] = [
+  'restaurant', 'supermarket', 'grocery', 'produce', 'bakery',
+  'herbalist', 'butcher', 'sweets', 'pharmacy', 'stationery',
+  'hardware', 'phones', 'other',
+];
+
+export type Place = {
+  id: string;
+  name_ar: string;
+  category: PlaceCategory;
+  zone_id: number;
+  zone_name: string;
+  phone: string | null;
+  whatsapp: string | null;
+  address_note: string | null;
+  hours_note: string | null;
+  note: string | null;
+};
+
+export type VehicleRate = {
+  kind: ServiceKind;
+  starts_from: string;
+  note_ar: string | null;
+};

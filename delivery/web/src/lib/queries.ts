@@ -1,6 +1,8 @@
 import 'server-only';
 import { q, q1 } from './db';
-import type { Provider, Zone, OpenRequest, PriceRow, ServiceKind } from './types';
+import type {
+  Provider, Zone, OpenRequest, PriceRow, ServiceKind, Place, VehicleRate,
+} from './types';
 
 export async function getZones(): Promise<Zone[]> {
   return q<Zone>(
@@ -89,6 +91,25 @@ export async function getPrices(): Promise<PriceRow[]> {
   );
 }
 
+export async function getPlaces(): Promise<Place[]> {
+  return q<Place>(
+    `select p.id, p.name_ar, p.category::text as category, p.zone_id,
+            p.phone, p.whatsapp, p.address_note, p.hours_note, p.note,
+            z.name_ar as zone_name
+       from places p
+       join service_zones z on z.id = p.zone_id
+      where p.is_active
+      order by p.sort_order, p.name_ar`
+  );
+}
+
+export async function getVehicleRates(): Promise<VehicleRate[]> {
+  return q<VehicleRate>(
+    `select kind::text as kind, starts_from, note_ar
+       from vehicle_rates where is_active order by sort_order, starts_from`
+  );
+}
+
 /* ---------------- الإدارة ---------------- */
 
 export async function adminListProviders() {
@@ -147,5 +168,24 @@ export async function adminListRequests() {
   }>(
     `select id, body, contact_phone, is_hidden, created_at, expires_at
        from requests order by created_at desc limit 50`
+  );
+}
+
+export async function adminListPlaces() {
+  return q<{
+    id: string;
+    name_ar: string;
+    category: string;
+    zone_name: string;
+    phone: string | null;
+    whatsapp: string | null;
+    hours_note: string | null;
+    is_active: boolean;
+  }>(
+    `select p.id, p.name_ar, p.category::text as category, z.name_ar as zone_name,
+            p.phone, p.whatsapp, p.hours_note, p.is_active
+       from places p
+       join service_zones z on z.id = p.zone_id
+      order by p.is_active desc, p.sort_order, p.name_ar`
   );
 }

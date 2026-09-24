@@ -1,7 +1,12 @@
 import { redirect } from 'next/navigation';
 import { isLoggedIn } from '@/lib/auth';
-import { adminListProviders, adminListReports, adminListRequests, getZones } from '@/lib/queries';
-import { SERVICE_LABELS, REPORT_REASONS, type ReportReason } from '@/lib/types';
+import {
+  adminListProviders, adminListReports, adminListRequests, adminListPlaces, getZones,
+} from '@/lib/queries';
+import {
+  SERVICE_LABELS, REPORT_REASONS, PLACE_LABELS,
+  type ReportReason, type PlaceCategory,
+} from '@/lib/types';
 import { sinceArabic } from '@/lib/format';
 import { AdminPanel } from './panel';
 
@@ -10,10 +15,11 @@ export const dynamic = 'force-dynamic';
 export default async function AdminPage() {
   if (!(await isLoggedIn())) redirect('/admin/login');
 
-  const [providers, reports, requests, zones] = await Promise.all([
+  const [providers, reports, requests, places, zones] = await Promise.all([
     adminListProviders(),
     adminListReports(),
     adminListRequests(),
+    adminListPlaces(),
     getZones(),
   ]);
 
@@ -32,6 +38,10 @@ export default async function AdminPage() {
         since: sinceArabic(r.created_at),
       }))}
       requests={requests.map((r) => ({ ...r, since: sinceArabic(r.created_at) }))}
+      places={places.map((p) => ({
+        ...p,
+        categoryLabel: PLACE_LABELS[p.category as PlaceCategory] ?? p.category,
+      }))}
     />
   );
 }

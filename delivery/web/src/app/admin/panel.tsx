@@ -3,8 +3,11 @@
 import { useState, useTransition } from 'react';
 import {
   addProvider, setVerified, setActive, hideRequest, handleReport, logout,
+  addPlace, setPlaceActive,
 } from '@/app/actions';
-import { SERVICE_LABELS, SERVICE_ORDER, type Zone } from '@/lib/types';
+import {
+  SERVICE_LABELS, SERVICE_ORDER, PLACE_LABELS, PLACE_ORDER, type Zone,
+} from '@/lib/types';
 import { BottomNav } from '@/components/BottomNav';
 import { Alert } from '@/components/icons';
 
@@ -18,11 +21,16 @@ type R = {
   reporter_phone: string | null; since: string; handled_at: string | null;
 };
 type Q = { id: string; body: string; contact_phone: string; is_hidden: boolean; since: string };
+type L = {
+  id: string; name_ar: string; categoryLabel: string; zone_name: string;
+  phone: string | null; whatsapp: string | null; hours_note: string | null; is_active: boolean;
+};
 
 export function AdminPanel({
-  zones, providers, reports, requests,
-}: { zones: Zone[]; providers: P[]; reports: R[]; requests: Q[] }) {
-  const [tab, setTab] = useState<'list' | 'add' | 'reports' | 'requests'>('list');
+  zones, providers, reports, requests, places,
+}: { zones: Zone[]; providers: P[]; reports: R[]; requests: Q[]; places: L[] }) {
+  const [tab, setTab] =
+    useState<'list' | 'add' | 'places' | 'addPlace' | 'reports' | 'requests'>('list');
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [shown, setShown] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -40,6 +48,12 @@ export function AdminPanel({
         </button>
         <button className="zchip" aria-pressed={tab === 'add'} onClick={() => setTab('add')}>
           إضافة سائق
+        </button>
+        <button className="zchip" aria-pressed={tab === 'places'} onClick={() => setTab('places')}>
+          المحلات ({places.length})
+        </button>
+        <button className="zchip" aria-pressed={tab === 'addPlace'} onClick={() => setTab('addPlace')}>
+          إضافة محل
         </button>
         <button className="zchip" aria-pressed={tab === 'reports'} onClick={() => setTab('reports')}>
           البلاغات{openReports > 0 ? ` (${openReports})` : ''}
@@ -169,6 +183,78 @@ export function AdminPanel({
               <button className="btn quiet" disabled={pending}
                 onClick={() => start(() => hideRequest(q.id, !q.is_hidden))}>
                 {q.is_hidden ? 'رجّعه' : 'إخفاء'}
+              </button>
+            </div>
+          </div>
+        ))
+      ) : null}
+
+      {tab === 'addPlace' ? (
+        <form
+          action={(fd) =>
+            start(async () => {
+              const r = await addPlace(fd);
+              setMsg(r.ok
+                ? { ok: true, text: 'المحل اتضاف.' }
+                : { ok: false, text: r.message ?? 'مقدرناش نضيفه.' });
+              if (r.ok) setTab('places');
+            })
+          }
+        >
+          <div className="note">
+            <Alert className="ic" />
+            <span>
+              رقم المحل رقم تجاري معلن عادةً، بس برضه استأذن صاحبه قبل ما تنشره — ده بيخليه
+              متعاون معاك بعدين.
+            </span>
+          </div>
+          <label className="field"><span>اسم المحل</span><input name="name_ar" required /></label>
+          <label className="field"><span>التصنيف</span>
+            <select name="category" required defaultValue="">
+              <option value="" disabled>اختار</option>
+              {PLACE_ORDER.map((c) => <option key={c} value={c}>{PLACE_LABELS[c]}</option>)}
+            </select></label>
+          <label className="field"><span>القرية</span>
+            <select name="zone_id" required defaultValue="">
+              <option value="" disabled>اختار</option>
+              {zones.map((z) => <option key={z.id} value={z.id}>{z.name_ar}</option>)}
+            </select></label>
+          <label className="field"><span>التليفون</span>
+            <input name="phone" type="tel" inputMode="tel" placeholder="01xxxxxxxxx أو أرضي" /></label>
+          <label className="field"><span>واتساب (لو فيه)</span>
+            <input name="whatsapp" type="tel" inputMode="tel" placeholder="01xxxxxxxxx" /></label>
+          <label className="field"><span>مكانه</span>
+            <input name="address_note" placeholder="جنب الجامع الكبير" /></label>
+          <label className="field"><span>المواعيد</span>
+            <input name="hours_note" placeholder="من 10ص لـ 12 بالليل" /></label>
+          <label className="field"><span>ملاحظة</span>
+            <input name="note" placeholder="بيوصّل بنفسه للقرية" /></label>
+          <button className="btn wide" type="submit" disabled={pending}>
+            {pending ? 'بنضيف…' : 'ضيف المحل'}
+          </button>
+        </form>
+      ) : null}
+
+      {tab === 'places' ? (
+        places.length === 0 ? (
+          <p className="lede">مفيش محلات لسه. ابدأ من «إضافة محل».</p>
+        ) : places.map((pl) => (
+          <div className="admin-row" key={pl.id}>
+            <div>
+              <div className="who">
+                {pl.name_ar}
+                <span className="pill info">{pl.categoryLabel}</span>
+                {!pl.is_active ? <span className="pill warn">مخفي</span> : null}
+              </div>
+              <div className="sub">
+                {[pl.phone, pl.whatsapp && pl.whatsapp !== pl.phone ? `واتساب ${pl.whatsapp}` : null,
+                  pl.zone_name, pl.hours_note].filter(Boolean).join(' · ')}
+              </div>
+            </div>
+            <div className="actions">
+              <button className={`btn quiet${pl.is_active ? ' danger' : ''}`} disabled={pending}
+                onClick={() => start(() => setPlaceActive(pl.id, !pl.is_active))}>
+                {pl.is_active ? 'إخفاء' : 'رجّعه'}
               </button>
             </div>
           </div>
