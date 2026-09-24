@@ -1,7 +1,7 @@
 -- ============================================================
---  بيانات مبدئية — المناطق والأسعار
---  ⚠️ الأسعار دي أسعار اختبار. راجع 02-pricing-economics.md
---     وعدّلها بعد ما تقيس المسافات الحقيقية.
+--  بيانات مبدئية: القرى والأسعار الاسترشادية
+--  ⚠️ الأسعار دي استرشادية وتقديرية. راجع 02-prices.md وعدّلها
+--     بعد ما تسأل ٥ سواقين و١٠ ناس عن اللي بيتدفع فعلاً.
 -- ============================================================
 
 insert into service_zones (name_ar, sort_order) values
@@ -13,40 +13,25 @@ insert into service_zones (name_ar, sort_order) values
 on conflict (name_ar) do nothing;
 
 -- داخل نفس القرية
-insert into zone_pricing (from_zone_id, to_zone_id, base_fare, driver_share_pct)
-select z.id, z.id, 35.00, 80.00
+insert into price_guide (from_zone_id, to_zone_id, kind, typical_min, typical_max, note_ar)
+select z.id, z.id, 'delivery', 20, 35, 'حسب المسافة جوه البلد'
 from service_zones z
-where z.name_ar in ('القيصرية','بطينة','محلة أبو علي','محلة زياد')
-on conflict do nothing;
+where z.name_ar in ('القيصرية','بطينة','محلة أبو علي','محلة زياد');
 
--- بين القيصرية والقرى المجاورة (الاتجاهين)
-insert into zone_pricing (from_zone_id, to_zone_id, base_fare, driver_share_pct)
-select a.id, b.id, 45.00, 80.00
+-- بين القيصرية والقرى المجاورة
+insert into price_guide (from_zone_id, to_zone_id, kind, typical_min, typical_max, note_ar)
+select a.id, b.id, 'delivery', 35, 50, 'بين القرى المتجاورة'
 from service_zones a, service_zones b
 where a.name_ar = 'القيصرية'
-  and b.name_ar in ('بطينة','محلة أبو علي','محلة زياد')
-on conflict do nothing;
+  and b.name_ar in ('بطينة','محلة أبو علي','محلة زياد');
 
-insert into zone_pricing (from_zone_id, to_zone_id, base_fare, driver_share_pct)
-select b.id, a.id, 45.00, 80.00
+-- مشوار المحلة الكبرى
+insert into price_guide (from_zone_id, to_zone_id, kind, typical_min, typical_max, note_ar)
+select a.id, b.id, 'mahalla_run', 70, 100, 'ذهاب وعودة — الانتظار الطويل بيزوّد'
 from service_zones a, service_zones b
-where a.name_ar = 'القيصرية'
-  and b.name_ar in ('بطينة','محلة أبو علي','محلة زياد')
-on conflict do nothing;
+where a.name_ar = 'القيصرية' and b.name_ar = 'المحلة الكبرى';
 
--- مشوار المحلة الكبرى: مجدول (٨٠) + فوري (١٣٠)
-insert into zone_pricing
-  (from_zone_id, to_zone_id, base_fare, driver_share_pct, is_scheduled_only, express_fare)
-select a.id, b.id, 80.00, 80.00, true, 130.00
-from service_zones a, service_zones b
-where a.name_ar = 'القيصرية' and b.name_ar = 'المحلة الكبرى'
-on conflict do nothing;
-
--- إضافات السعر
-insert into pricing_rules (code, label_ar, amount, percent) values
-  ('waiting_10min',   'انتظار كل ١٠ دقائق بعد أول ١٠',  10.00, null),
-  ('extra_stop',      'وقفة إضافية في نفس النطاق',        15.00, null),
-  ('purchase_fee',    'رسوم طلب شراء',                    10.00, 5.00),
-  ('night_surcharge', 'طلب ليلي بعد ٩ مساءً',             null,  15.00),
-  ('cancel_after_move','إلغاء بعد تحرك السائق',           20.00, null)
-on conflict (code) do nothing;
+-- عجلة للطلبات القريبة جدًا
+insert into price_guide (from_zone_id, to_zone_id, kind, typical_min, typical_max, note_ar)
+select z.id, z.id, 'bicycle', 15, 25, 'للطلبات القريبة جوه البلد'
+from service_zones z where z.name_ar = 'القيصرية';

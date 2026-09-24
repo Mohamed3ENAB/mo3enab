@@ -1,130 +1,135 @@
 -- ============================================================
---  اختبار الصلاحيات (RLS) — شغّله بعد أي تعديل في السكيمة
+--  اختبارات الصلاحيات — شغّلها بعد أي تعديل في السكيمة
 --
---  محليًا (بالترتيب ده بالظبط):
---    createdb valtest
---    psql -d valtest -v ON_ERROR_STOP=1 -f db/00-local-shim.sql
---    psql -d valtest -v ON_ERROR_STOP=1 -f db/schema.sql
---    psql -d valtest -v ON_ERROR_STOP=1 -f db/rls-test.sql
---
---  ⚠️ الاختبار ده اتنفّذ فعليًا على PostgreSQL 16 وعدّى بالكامل (٧/٧).
---     لو أي assert فشل هيرمي exception ويقف.
+--  محليًا (بالترتيب ده):
+--    psql -d dalil -v ON_ERROR_STOP=1 -f db/00-local-shim.sql
+--    psql -d dalil -v ON_ERROR_STOP=1 -f db/schema.sql
+--    psql -d dalil -v ON_ERROR_STOP=1 -f db/seed.sql
+--    psql -d dalil -v ON_ERROR_STOP=1 -f db/rls-test.sql
 -- ============================================================
 
--- دور تطبيق عادي: RLS ما بتتطبقش على superuser
-do $$ begin
-  if not exists (select 1 from pg_roles where rolname='app_user') then
-    create role app_user nologin;
-  end if;
-end $$;
-grant usage on schema public, auth to app_user;
-grant select, insert, update on all tables in schema public to app_user;
-grant usage, select on all sequences in schema public to app_user;
-
 -- ---------- بيانات اختبار ----------
-insert into auth.users (id) values
-  ('11111111-1111-1111-1111-111111111111'),
-  ('22222222-2222-2222-2222-222222222222'),
-  ('33333333-3333-3333-3333-333333333333')
+insert into providers (id, display_name, phone, zone_id, services, is_verified, is_active)
+select 'bbbbbbbb-0000-0000-0000-000000000001',
+       'سائق تجريبي', '01000000001', z.id,
+       array['delivery','mahalla_run']::service_kind[], true, true
+from service_zones z where z.name_ar='القيصرية'
 on conflict do nothing;
 
-insert into profiles (id, role, full_name, phone) values
-  ('11111111-1111-1111-1111-111111111111','customer','عميل أ','01000000001'),
-  ('22222222-2222-2222-2222-222222222222','customer','عميل ب','01000000002'),
-  ('33333333-3333-3333-3333-333333333333','driver','سائق','01000000003')
+insert into provider_tokens (provider_id, token)
+values ('bbbbbbbb-0000-0000-0000-000000000001','TESTTOKEN123')
 on conflict do nothing;
 
-insert into drivers (id, is_verified) values
-  ('33333333-3333-3333-3333-333333333333', true) on conflict do nothing;
-
-insert into orders (id, customer_id, type, description, delivery_fee)
-values ('aaaaaaaa-0000-0000-0000-000000000001',
-        '11111111-1111-1111-1111-111111111111','shop_purchase','٢ كيلو طماطم', 35)
+insert into reports (provider_id, reason, details)
+values ('bbbbbbbb-0000-0000-0000-000000000001','other','بلاغ تجريبي')
 on conflict do nothing;
-
-insert into order_stops (order_id, kind, description, landmark, contact_phone)
-values ('aaaaaaaa-0000-0000-0000-000000000001',
-        'dropoff','شارع الجامع','قدام صيدلية النور','01000000001')
-on conflict do nothing;
-
--- ---------- أداة مساعدة: انتحال هوية مستخدم ----------
-create or replace procedure act_as(p uuid) language plpgsql as $$
-begin
-  execute format(
-    'create or replace function auth.uid() returns uuid language sql stable as %L',
-    'select ' || quote_literal(p::text) || '::uuid');
-end $$;
 
 -- ---------- الاختبارات ----------
 do $$
-declare n int;
+declare n int; v_live boolean;
 begin
-  -- ١) العميل يشوف طلبه
-  call act_as('11111111-1111-1111-1111-111111111111');
-  set local role app_user;
-  select count(*) into n from orders;
-  assert n = 1, '١ فشل: العميل صاحب الطلب المفروض يشوفه';
-  select count(*) into n from order_stops;
-  assert n = 1, '١ب فشل: وقفات الطلب المفروض تبان لصاحبه';
+  -- ١) الزائر يقرا الدليل من غير أي تسجيل
+  set local role anon;
+  select count(*) into n from providers_public;
+  assert n >= 1, '١ فشل: الزائر مش شايف الدليل — ده الخدمة نفسها';
   reset role;
 
-  -- ٢) عميل تاني ما يشوفش حاجة
-  call act_as('22222222-2222-2222-2222-222222222222');
-  set local role app_user;
-  select count(*) into n from orders;
-  assert n = 0, '٢ فشل: عميل تاني شاف طلب مش بتاعه ← تسريب بيانات';
-  select count(*) into n from order_stops;
-  assert n = 0, '٢ب فشل: عميل تاني شاف عنوان مش بتاعه ← تسريب عناوين';
+  -- ٢) الزائر ما يقدرش يقرا لينكات السواقين
+  set local role anon;
+  begin
+    select count(*) into n from provider_tokens;
+    raise exception '٢ فشل: الزائر قرا التوكنات ← أي حد يقدر يتحكم في توفر أي سائق';
+  exception when insufficient_privilege then null;
+  end;
   reset role;
 
-  -- ٣) سائق غير مسنَد ما يشوفش الطلب
-  call act_as('33333333-3333-3333-3333-333333333333');
-  set local role app_user;
-  select count(*) into n from orders;
-  assert n = 0, '٣ فشل: سائق شاف طلب مش مسنَد له';
+  -- ٣) الزائر ما يقدرش يقرا البلاغات
+  set local role anon;
+  begin
+    select count(*) into n from reports;
+    assert n = 0, '٣ فشل: الزائر شاف البلاغات ← دي سرية';
+  exception when insufficient_privilege then null;
+  end;
   reset role;
 
-  -- ٤) التأكيد بيولّد رمز تسليم وبيسجل الحالة
-  update orders set status='confirmed'
-   where id='aaaaaaaa-0000-0000-0000-000000000001';
-  select count(*) into n from orders
-   where id='aaaaaaaa-0000-0000-0000-000000000001'
-     and delivery_code is not null and confirmed_at is not null;
-  assert n = 1, '٤ فشل: رمز التسليم أو وقت التأكيد مااتولّدش';
-  select count(*) into n from status_events
-   where order_id='aaaaaaaa-0000-0000-0000-000000000001'
-     and from_status='draft' and to_status='confirmed';
-  assert n = 1, '٤ب فشل: انتقال الحالة مااتسجلش';
-
-  -- ٥) بعد الإسناد، السائق يشوف الطلب
-  insert into assignments (order_id, driver_id, accepted, responded_at)
-  values ('aaaaaaaa-0000-0000-0000-000000000001',
-          '33333333-3333-3333-3333-333333333333', true, now());
-  call act_as('33333333-3333-3333-3333-333333333333');
-  set local role app_user;
-  select count(*) into n from orders;
-  assert n = 1, '٥ فشل: السائق المسنَد مش شايف الطلب';
+  -- ٤) الزائر ما يقدرش يعدّل توفر سائق مباشرة
+  set local role anon;
+  begin
+    update providers set is_available = true
+     where id='bbbbbbbb-0000-0000-0000-000000000001';
+    if found then
+      raise exception '٤ فشل: الزائر عدّل بيانات سائق مباشرة';
+    end if;
+  exception when insufficient_privilege then null;
+  end;
   reset role;
 
-  -- ٦) العميل التاني لسه مش شايف حاجة
-  call act_as('22222222-2222-2222-2222-222222222222');
-  set local role app_user;
-  select count(*) into n from orders;
-  assert n = 0, '٦ فشل: العزل اتكسر بعد الإسناد';
-  reset role;
-
-  raise notice '✅ كل اختبارات الصلاحيات عدّت';
+  raise notice '✅ اختبارات القراءة والكتابة عدّت';
 end $$;
 
--- ٧) سائقين اتنين مقبولين لنفس الطلب = ممنوع
+-- ٥) اللينك الخاص بيشتغل
+do $$
+declare r record;
+begin
+  set local role anon;
+  select * into r from toggle_availability('TESTTOKEN123', true);
+  assert r.available is true, '٥ فشل: اللينك الخاص مش بيفتح التوفر';
+  reset role;
+  raise notice '✅ ٥ عدّى: اللينك الخاص بيغيّر التوفر';
+end $$;
+
+-- ٦) لينك غلط بيترفض
 do $$
 begin
+  set local role anon;
   begin
-    insert into assignments (order_id, driver_id, accepted)
-    values ('aaaaaaaa-0000-0000-0000-000000000001',
-            '33333333-3333-3333-3333-333333333333', true);
-    raise exception '٧ فشل: النظام سمح بسائقين مقبولين لنفس الطلب';
-  exception when unique_violation then
-    raise notice '✅ ٧ عدّى: الإسناد المزدوج مرفوض';
+    perform toggle_availability('WRONG-TOKEN', true);
+    raise exception '٦ فشل: لينك غلط اتقبل';
+  exception when others then
+    if sqlerrm like '%لينك غير صحيح%' then
+      raise notice '✅ ٦ عدّى: اللينك الغلط مرفوض';
+    else raise;
+    end if;
   end;
+  reset role;
+end $$;
+
+-- ٧) السائق بقى ظاهر كـ live بعد ما فتح توفره
+do $$
+declare v boolean;
+begin
+  set local role anon;
+  select live into v from providers_public
+   where id='bbbbbbbb-0000-0000-0000-000000000001';
+  assert v is true, '٧ فشل: السائق فتح توفره بس مش ظاهر live';
+  reset role;
+  raise notice '✅ ٧ عدّى: التوفر بيظهر في الدليل';
+end $$;
+
+-- ٨) التوفر بينتهي تلقائيًا بعد ٤ ساعات
+do $$
+declare v boolean;
+begin
+  update providers
+     set availability_updated_at = now() - interval '5 hours'
+   where id='bbbbbbbb-0000-0000-0000-000000000001';
+  set local role anon;
+  select live into v from providers_public
+   where id='bbbbbbbb-0000-0000-0000-000000000001';
+  assert v is false, '٨ فشل: توفر قديم لسه بيتعرض ← قايمة كذابة بتضيّع الثقة';
+  reset role;
+  raise notice '✅ ٨ عدّى: التوفر القديم بينتهي لوحده';
+end $$;
+
+-- ٩) أي حد يقدر يكتب طلب في اللوحة
+do $$
+declare n int;
+begin
+  set local role anon;
+  insert into requests (kind, body, contact_phone)
+  values ('delivery','محتاج حد يجيبلي دوا من المحلة','01000000009');
+  select count(*) into n from requests where expires_at > now();
+  assert n >= 1, '٩ فشل: لوحة الطلبات مش شغالة للزائر';
+  reset role;
+  raise notice '✅ ٩ عدّى: لوحة الطلبات مفتوحة للكل';
 end $$;
