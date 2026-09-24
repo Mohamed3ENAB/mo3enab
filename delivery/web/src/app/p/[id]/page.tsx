@@ -3,9 +3,10 @@ import Link from 'next/link';
 import { getProvider } from '@/lib/queries';
 import { SERVICE_LABELS } from '@/lib/types';
 import { sinceArabic, telHref } from '@/lib/format';
-import { TopBar } from '@/components/TopBar';
 import { Foot } from '@/components/Foot';
+import { Avatar } from '@/components/Avatar';
 import { FeedbackForms } from './forms';
+import { Check, Phone, Star, Pin, Home } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,36 +14,48 @@ export default async function ProviderPage({ params }: { params: Promise<{ id: s
   const { id } = await params;
   const p = await getProvider(id);
   if (!p) notFound();
+  const rating = Number(p.rating_count) > 0 ? p.rating_avg : null;
 
   return (
-    <>
-      <TopBar />
-      <main className="wrap page">
-        <h1>{p.display_name}</h1>
-        <p className="lede">
-          {[p.vehicle_note, p.services.map((s) => SERVICE_LABELS[s]).join('، '), p.zone_name]
-            .filter(Boolean)
-            .join(' · ')}
-          {p.is_verified ? ' · موثّق' : ''}
-        </p>
+    <main className="wrap page">
+      <Link className="linkish" href="/" style={{ marginBottom: 14 }}>
+        <Home size={16} /> رجوع للدليل
+      </Link>
 
-        <p className={`status${p.live ? '' : ''}`} style={{ color: p.live ? 'var(--live)' : 'var(--muted)' }}>
-          <span className="dot" aria-hidden="true" /> {p.live ? 'متاح' : 'مش متاح'}{' '}
-          <span className="since">{sinceArabic(p.availability_updated_at)}</span>
-        </p>
-
-        <div className="actions" style={{ margin: '18px 0 30px' }}>
-          <a className="btn" href={telHref(p.phone)}>
-            اتصال
-          </a>
-          <Link className="btn ghost" href="/">
-            رجوع للدليل
-          </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 13, margin: '10px 0 18px' }}>
+        <Avatar name={p.display_name} verified={p.is_verified}>
+          <Check size={12} />
+        </Avatar>
+        <div>
+          <h1 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {p.display_name}
+            {rating ? (
+              <span className="rate">
+                <Star /> {rating}
+              </span>
+            ) : null}
+          </h1>
+          <p className="lede" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Pin size={13} /> {p.zone_name} · {p.services.map((s) => SERVICE_LABELS[s]).join('، ')}
+          </p>
         </div>
+      </div>
 
-        <FeedbackForms providerId={p.id} name={p.display_name} />
-        <Foot />
-      </main>
-    </>
+      <span className={`state ${p.live ? 'on' : 'off'}`}>
+        <span className="beacon">
+          <i />
+          <i />
+        </span>
+        {p.live ? 'متاح' : 'مش متاح'}
+        <span className="since">{sinceArabic(p.availability_updated_at)}</span>
+      </span>
+
+      <a className="btn call wide" href={telHref(p.phone)} style={{ margin: '18px 0 26px' }}>
+        <Phone /> اتصل بـ {p.display_name.split(' ')[0]}
+      </a>
+
+      <FeedbackForms providerId={p.id} name={p.display_name} />
+      <Foot />
+    </main>
   );
 }

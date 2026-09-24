@@ -3,6 +3,8 @@ import { getProviderByToken } from '@/lib/queries';
 import { SERVICE_LABELS } from '@/lib/types';
 import { sinceArabic } from '@/lib/format';
 import { AvailabilityToggle } from './toggle';
+import { Avatar } from '@/components/Avatar';
+import { Check, Info, Alert, Pin } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,11 +20,17 @@ export default async function DriverPage({ params }: { params: Promise<{ token: 
 
   return (
     <main className="wrap page">
-      <h1>أهلاً {me.display_name.split(' ')[0]}</h1>
-      <p className="lede">
-        {me.zone_name} · {me.services.map((s) => SERVICE_LABELS[s]).join('، ')}
-        {me.is_verified ? ' · موثّق' : ''}
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 13, marginBottom: 24 }}>
+        <Avatar name={me.display_name} verified={me.is_verified}>
+          <Check size={12} />
+        </Avatar>
+        <div>
+          <h1 style={{ margin: 0 }}>أهلاً {me.display_name.split(' ')[0]}</h1>
+          <p className="lede" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Pin size={13} /> {me.zone_name} · {me.services.map((s) => SERVICE_LABELS[s]).join('، ')}
+          </p>
+        </div>
+      </div>
 
       <AvailabilityToggle
         token={token}
@@ -30,14 +38,20 @@ export default async function DriverPage({ params }: { params: Promise<{ token: 
         since={sinceArabic(me.availability_updated_at)}
       />
 
-      <div className="note">
-        بيتقفل لوحده بعد <strong>٤ ساعات</strong> لو نسيت. ده عشان القايمة تفضل صادقة — الناس
-        بتبطل تثق في التطبيق لو لقت حد مكتوب إنه متاح وهو مش متاح.
+      <div className="note" style={{ marginTop: 22 }}>
+        <Info className="ic" />
+        <span>
+          بيتقفل لوحده بعد <strong>٤ ساعات</strong> لو نسيت. ده عشان القايمة تفضل صادقة — الناس
+          بتبطل تثق في التطبيق لو لقت حد مكتوب إنه متاح وهو مش متاح.
+        </span>
       </div>
 
       <div className="note warn">
-        <strong>اللينك ده ليك انت بس.</strong> متبعتهوش لحد ومتحطهوش في جروب. أي حد معاه اللينك
-        يقدر يفتح ويقفل توفرك.
+        <Alert className="ic" />
+        <span>
+          <strong>اللينك ده ليك انت بس.</strong> متبعتهوش لحد ومتحطهوش في جروب. أي حد معاه اللينك
+          يقدر يفتح ويقفل توفرك.
+        </span>
       </div>
     </main>
   );

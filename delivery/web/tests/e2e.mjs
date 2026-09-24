@@ -22,11 +22,13 @@ const ok  = (m) => { pass++; console.log('✅ ' + m); };
 const bad = (m) => { fail++; console.log('❌ ' + m); };
 
 const b = await chromium.launch();
+const settle = (pg, ms = 700) => pg.waitForTimeout(ms);
 const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, locale: 'ar-EG' });
 const p = await ctx.newPage();
 
 // ١) الزائر يشوف الدليل من غير تسجيل
-await p.goto(BASE + '/', { waitUntil: 'networkidle' });
+await p.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(p);
 const liveBefore = await p.locator('.row.live').count();
 liveBefore === 3 ? ok(`الزائر شاف الدليل بدون تسجيل (${liveBefore} متاحين)`) : bad(`متوقع 3 متاحين، لقينا ${liveBefore}`);
 
@@ -35,36 +37,57 @@ const tel = await p.locator('.row.live .btn.call').first().getAttribute('href');
 /^tel:\d+/.test(tel ?? '') ? ok(`زر الاتصال بيفتح الاتصال (${tel})`) : bad(`href غلط: ${tel}`);
 
 // ٣) السائق يقفل توفره → يختفي من المتاحين
-await p.goto(`${BASE}/d/${TOK}`, { waitUntil: 'networkidle' });
+await p.goto(`${BASE}/d/${TOK}`, { waitUntil: 'domcontentloaded' });
 await p.locator('button.toggle').click();
 await p.waitForTimeout(1200);
 const offText = await p.locator('button.toggle').innerText();
 offText.includes('مش متاح') ? ok('السائق قفل توفره') : bad(`نص الزرار: ${offText}`);
 
-await p.goto(BASE + '/', { waitUntil: 'networkidle' });
+await p.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(p);
 const liveAfter = await p.locator('.row.live').count();
 liveAfter === liveBefore - 1 ? ok(`اختفى من المتاحين فورًا (${liveBefore} ← ${liveAfter})`) : bad(`متوقع ${liveBefore-1}، لقينا ${liveAfter}`);
 
 // ٤) يرجّع يفتح → يرجع يظهر
-await p.goto(`${BASE}/d/${TOK}`, { waitUntil: 'networkidle' });
+await p.goto(`${BASE}/d/${TOK}`, { waitUntil: 'domcontentloaded' });
 await p.locator('button.toggle').click();
 await p.waitForTimeout(1200);
-await p.goto(BASE + '/', { waitUntil: 'networkidle' });
+await p.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(p);
 const liveBack = await p.locator('.row.live').count();
 liveBack === liveBefore ? ok('رجع يظهر لما فتح توفره') : bad(`متوقع ${liveBefore}، لقينا ${liveBack}`);
+
+// ٤ب) فلتر الخدمة بيشتغل في المتصفح
+await p.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(p);
+const allRows = await p.locator('.row').count();
+await p.locator('.svc[aria-pressed="false"]').first().click();
+await p.waitForTimeout(400);
+const filtered = await p.locator('.row').count();
+filtered < allRows ? ok(`فلتر الخدمة بيصفّي (${allRows} ← ${filtered})`) : bad('الفلتر مبيعملش حاجة');
+
+// ٤ج) البحث بيشتغل
+await p.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(p);
+await p.fill('input[type="search"]', 'محمود');
+await p.waitForTimeout(400);
+const found = await p.locator('.row').count();
+found === 1 ? ok('البحث بالاسم بيشتغل') : bad(`متوقع نتيجة واحدة، لقينا ${found}`);
 
 // ٥) لينك غلط
 const r = await p.goto(BASE + '/d/not-a-real-token');
 r.status() === 404 ? ok('اللينك الغلط بيرجع 404') : bad(`متوقع 404، رجع ${r.status()}`);
 
 // ٦) نشر طلب في اللوحة
-await p.goto(BASE + '/requests', { waitUntil: 'networkidle' });
+await p.goto(BASE + '/requests', { waitUntil: 'domcontentloaded' });
+await settle(p);
 const reqsBefore = await p.locator('.req').count();
 await p.fill('textarea[name="body"]', 'اختبار: محتاج حد يجيبلي كيلو طماطم من السوق');
 await p.fill('input[name="contact_phone"]', '01234567890');
 await p.click('button[type="submit"]');
 await p.waitForTimeout(1500);
-await p.goto(BASE + '/requests', { waitUntil: 'networkidle' });
+await p.goto(BASE + '/requests', { waitUntil: 'domcontentloaded' });
+await settle(p);
 const reqsAfter = await p.locator('.req').count();
 reqsAfter === reqsBefore + 1 ? ok(`الطلب اتنشر (${reqsBefore} ← ${reqsAfter})`) : bad(`متوقع ${reqsBefore+1}، لقينا ${reqsAfter}`);
 
@@ -77,7 +100,8 @@ const badMsg = await p.locator('.msg.bad').count();
 badMsg > 0 ? ok('الرقم الغلط اترفض برسالة واضحة') : bad('الرقم الغلط عدّى');
 
 // ٨) /admin يرمي على تسجيل الدخول
-await p.goto(BASE + '/admin', { waitUntil: 'networkidle' });
+await p.goto(BASE + '/admin', { waitUntil: 'domcontentloaded' });
+await settle(p);
 p.url().includes('/admin/login') ? ok('/admin محمية — بترمي على الدخول') : bad(`مرماش: ${p.url()}`);
 
 // ٩) كلمة سر غلط
@@ -100,7 +124,8 @@ await p.locator('.admin-row').first().locator('button:has-text("أوقف")').cli
 await p.waitForTimeout(1500);
 const ctx2 = await b.newContext({ viewport: { width: 390, height: 844 } });
 const guest = await ctx2.newPage();
-await guest.goto(BASE + '/', { waitUntil: 'networkidle' });
+await guest.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+await settle(guest);
 const afterSuspend = await guest.locator('.row').count();
 afterSuspend === 5 ? ok(`السائق الموقوف اختفى من الدليل فورًا (6 ← ${afterSuspend})`) : bad(`متوقع 5 صفوف، لقينا ${afterSuspend}`);
 

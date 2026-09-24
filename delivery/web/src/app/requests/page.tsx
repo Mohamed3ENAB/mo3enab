@@ -1,8 +1,9 @@
 import { getOpenRequests, getZones } from '@/lib/queries';
-import { SERVICE_LABELS, SERVICE_ORDER } from '@/lib/types';
+import { SERVICE_LABELS } from '@/lib/types';
 import { sinceArabic, telHref } from '@/lib/format';
-import { TopBar } from '@/components/TopBar';
+import { BottomNav } from '@/components/BottomNav';
 import { RequestForm } from './form';
+import { Phone, Clock, Pin, Info, Board } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,45 +11,61 @@ export default async function RequestsPage() {
   const [reqs, zones] = await Promise.all([getOpenRequests(), getZones()]);
 
   return (
-    <>
-      <TopBar current="requests" />
-      <main className="wrap page">
-        <h1>لوحة الطلبات</h1>
-        <p className="lede">
-          مش لاقي حد متاح؟ اكتب اللي محتاجه هنا، والسواقين اللي بيتابعوا اللوحة هيشوفوه
-          ويكلموك.
-        </p>
+    <div className="app">
+      <header className="hero">
+        <div className="hero-top">
+          <div className="hero-brand">
+            <span className="hero-logo">
+              <Board size={20} />
+            </span>
+            لوحة الطلبات
+          </div>
+        </div>
+        <h1>مش لاقي حد متاح؟</h1>
+        <p>اكتب اللي محتاجه، واللي هيفتح هيشوفه ويكلمك.</p>
+      </header>
 
-        <RequestForm zones={zones} />
+      <main className="wrap page" style={{ paddingTop: 22 }}>
+        <div className="card">
+          <RequestForm zones={zones} />
+        </div>
 
         <h2>الطلبات المفتوحة</h2>
         {reqs.length === 0 ? (
-          <p className="lede">مفيش طلبات مفتوحة دلوقتي. أول واحد يكتب.</p>
+          <div className="empty pop">
+            <h3>مفيش طلبات دلوقتي</h3>
+            <p>أول واحد يكتب.</p>
+          </div>
         ) : (
-          reqs.map((r) => (
-            <div className="req" key={r.id}>
+          reqs.map((r, i) => (
+            <div className="req rise" key={r.id} style={{ animationDelay: `${Math.min(i, 8) * 55}ms` }}>
               <p>{r.body}</p>
-              <p className="when">
-                {[r.zone_name, r.kind ? SERVICE_LABELS[r.kind] : null]
-                  .filter(Boolean)
-                  .join(' · ')}
-                {r.zone_name || r.kind ? ' · ' : ''}
-                {sinceArabic(r.created_at)}
-              </p>
-              <div className="actions">
-                <a className="btn ghost" href={telHref(r.contact_phone)}>
-                  اتصل بصاحب الطلب
-                </a>
+              <div className="when">
+                {r.zone_name ? (
+                  <>
+                    <Pin size={13} /> {r.zone_name}
+                  </>
+                ) : null}
+                {r.kind ? <span className="pill info">{SERVICE_LABELS[r.kind]}</span> : null}
+                <Clock size={13} /> {sinceArabic(r.created_at)}
               </div>
+              <a className="btn ghost wide" href={telHref(r.contact_phone)} style={{ marginTop: 12 }}>
+                <Phone /> اتصل بصاحب الطلب
+              </a>
             </div>
           ))
         )}
 
-        <div className="note" style={{ marginTop: 26 }}>
-          الطلب بيختفي لوحده بعد <strong>٦ ساعات</strong>. متكتبش بيانات أكتر من اللازم — الصفحة
-          دي مفتوحة لأي حد.
+        <div className="note" style={{ marginTop: 20 }}>
+          <Info className="ic" />
+          <span>
+            الطلب بيختفي لوحده بعد <strong>٦ ساعات</strong>. متكتبش بيانات أكتر من اللازم — الصفحة
+            دي مفتوحة لأي حد.
+          </span>
         </div>
       </main>
-    </>
+
+      <BottomNav current="requests" />
+    </div>
   );
 }

@@ -13,7 +13,7 @@ const db = join(here, '..', '..', 'db');
 
 const url = process.env.DATABASE_URL;
 if (!url) {
-  console.error('DATABASE_URL مش متظبط. انسخ .env.example لـ .env وحط الرابط.');
+  console.error('DATABASE_URL مش متظبط. انسخ .env.example لـ .env وحط الرابط فيه.');
   process.exit(1);
 }
 

@@ -36,3 +36,11 @@ export function waHref(phone: string, text?: string) {
   const q = text ? `?text=${encodeURIComponent(text)}` : '';
   return `https://wa.me/${p}${q}`;
 }
+
+/** ‏«20» مش «20.00» — بوستجرس بيرجع numeric بكسور. */
+export function money(v: string | null): string {
+  if (v === null) return '';
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '';
+  return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
+}

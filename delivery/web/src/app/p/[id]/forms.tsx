@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { rateProvider, reportProvider } from '@/app/actions';
 import { REPORT_REASONS } from '@/lib/types';
+import { Star, Alert } from '@/components/icons';
 
 export function FeedbackForms({ providerId, name }: { providerId: string; name: string }) {
   const [rateMsg, setRateMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -11,8 +12,11 @@ export function FeedbackForms({ providerId, name }: { providerId: string; name: 
 
   return (
     <>
-      <h2>قيّم {name.split(' ')[0]}</h2>
+      <h2 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Star size={17} /> قيّم {name.split(' ')[0]}
+      </h2>
       <form
+        className="card"
         action={(fd) =>
           start(async () => {
             const r = await rateProvider(fd);
@@ -48,9 +52,12 @@ export function FeedbackForms({ providerId, name }: { providerId: string; name: 
         </button>
       </form>
 
-      <h2>بلّغ عن مشكلة</h2>
+      <h2 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Alert size={17} /> بلّغ عن مشكلة
+      </h2>
       <p className="lede">البلاغ بيوصل للإدارة بس، ومحدش تاني بيشوفه.</p>
       <form
+        className="card"
         action={(fd) =>
           start(async () => {
             const r = await reportProvider(fd);

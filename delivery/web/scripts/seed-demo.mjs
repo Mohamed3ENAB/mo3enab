@@ -5,7 +5,7 @@
 import pg from 'pg';
 
 const url = process.env.DATABASE_URL;
-if (!url) { console.error('DATABASE_URL مش متظبط.'); process.exit(1); }
+if (!url) { console.error('DATABASE_URL مش متظبط. شوف .env'); process.exit(1); }
 if (process.env.NODE_ENV === 'production') {
   console.error('متشغلهوش على الإنتاج.'); process.exit(1);
 }
@@ -41,6 +41,11 @@ for (const [name, phone, wa, zone, svc, veh, note, ver, av, mins] of demo) {
       `insert into provider_tokens (provider_id) values ($1) returning token`, [r.rows[0].id]
     );
     console.log(`${name.padEnd(16)} /d/${t.rows[0].token}`);
+    // تقييمات تجريبية عشان تشوف الشارة في الكارت
+    const stars = { 'محمود السيد': [5, 4, 5], 'أحمد فرغلي': [5, 5], 'كريم أبو زيد': [4, 5, 4, 5] }[name];
+    for (const n of stars ?? []) {
+      await c.query('insert into ratings (provider_id, stars) values ($1, $2)', [r.rows[0].id, n]);
+    }
   }
 }
 await c.end();

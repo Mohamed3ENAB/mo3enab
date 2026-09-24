@@ -5,6 +5,8 @@ import {
   addProvider, setVerified, setActive, hideRequest, handleReport, logout,
 } from '@/app/actions';
 import { SERVICE_LABELS, SERVICE_ORDER, type Zone } from '@/lib/types';
+import { BottomNav } from '@/components/BottomNav';
+import { Alert } from '@/components/icons';
 
 type P = {
   id: string; display_name: string; phone: string; zone_name: string;
@@ -28,20 +30,21 @@ export function AdminPanel({
   const openReports = reports.filter((r) => !r.handled_at).length;
 
   return (
+    <div className="app">
     <main className="wrap page">
       <h1>لوحة الإدارة</h1>
 
-      <div className="filters" style={{ padding: '0 0 18px' }}>
-        <button className="chip" aria-pressed={tab === 'list'} onClick={() => setTab('list')}>
+      <div className="tabs">
+        <button className="zchip" aria-pressed={tab === 'list'} onClick={() => setTab('list')}>
           السواقين ({providers.length})
         </button>
-        <button className="chip" aria-pressed={tab === 'add'} onClick={() => setTab('add')}>
+        <button className="zchip" aria-pressed={tab === 'add'} onClick={() => setTab('add')}>
           إضافة سائق
         </button>
-        <button className="chip" aria-pressed={tab === 'reports'} onClick={() => setTab('reports')}>
+        <button className="zchip" aria-pressed={tab === 'reports'} onClick={() => setTab('reports')}>
           البلاغات{openReports > 0 ? ` (${openReports})` : ''}
         </button>
-        <button className="chip" aria-pressed={tab === 'requests'} onClick={() => setTab('requests')}>
+        <button className="zchip" aria-pressed={tab === 'requests'} onClick={() => setTab('requests')}>
           الطلبات
         </button>
       </div>
@@ -60,8 +63,9 @@ export function AdminPanel({
             })
           }
         >
-          <div className="note">
-            🔴 متضيفش حد قبل ما تشوف بطاقته ورخصته، وتاخد منه موافقة مكتوبة على نشر رقمه.
+          <div className="note warn">
+            <Alert className="ic" />
+            <span>متضيفش حد قبل ما تشوف بطاقته ورخصته، وتاخد منه موافقة مكتوبة على نشر رقمه.</span>
           </div>
           <label className="field"><span>الاسم</span><input name="display_name" required /></label>
           <label className="field"><span>الموبايل</span>
@@ -96,7 +100,7 @@ export function AdminPanel({
           <p className="lede">مفيش سواقين لسه. ابدأ من تبويب «إضافة سائق».</p>
         ) : providers.map((p) => (
           <div className="admin-row" key={p.id}>
-            <div style={{ flex: '1 1 240px' }}>
+            <div>
               <div className="who">
                 {p.display_name}{' '}
                 {p.is_verified ? <span className="pill on">موثّق</span> : null}
@@ -110,7 +114,7 @@ export function AdminPanel({
                 <div className="tokenbox">/d/{p.token}</div>
               ) : null}
             </div>
-            <div className="actions" style={{ flex: '0 0 auto', marginTop: 0 }}>
+            <div className="actions">
               <button className="btn quiet" onClick={() => setShown(shown === p.id ? null : p.id)}>
                 {shown === p.id ? 'إخفاء اللينك' : 'اللينك'}
               </button>
@@ -131,7 +135,7 @@ export function AdminPanel({
         reports.length === 0 ? <p className="lede">مفيش بلاغات.</p> :
         reports.map((r) => (
           <div className="admin-row" key={r.id}>
-            <div style={{ flex: '1 1 240px' }}>
+            <div>
               <div className="who">
                 {r.provider_name} — {r.reasonLabel}{' '}
                 {r.handled_at ? <span className="pill on">اتعامل معاه</span> : null}
@@ -141,8 +145,10 @@ export function AdminPanel({
               </div>
             </div>
             {!r.handled_at ? (
-              <button className="btn quiet" disabled={pending}
-                onClick={() => start(() => handleReport(r.id))}>علّم كمتعامَل معاه</button>
+              <div className="actions">
+                <button className="btn quiet" disabled={pending}
+                  onClick={() => start(() => handleReport(r.id))}>علّم كمتعامَل معاه</button>
+              </div>
             ) : null}
           </div>
         ))
@@ -152,24 +158,28 @@ export function AdminPanel({
         requests.length === 0 ? <p className="lede">مفيش طلبات.</p> :
         requests.map((q) => (
           <div className="admin-row" key={q.id}>
-            <div style={{ flex: '1 1 240px' }}>
+            <div>
               <div className="who">
                 {q.body.slice(0, 80)}{q.body.length > 80 ? '…' : ''}{' '}
                 {q.is_hidden ? <span className="pill warn">مخفي</span> : null}
               </div>
               <div className="sub">{q.contact_phone} · {q.since}</div>
             </div>
-            <button className="btn quiet" disabled={pending}
-              onClick={() => start(() => hideRequest(q.id, !q.is_hidden))}>
-              {q.is_hidden ? 'رجّعه' : 'إخفاء'}
-            </button>
+            <div className="actions">
+              <button className="btn quiet" disabled={pending}
+                onClick={() => start(() => hideRequest(q.id, !q.is_hidden))}>
+                {q.is_hidden ? 'رجّعه' : 'إخفاء'}
+              </button>
+            </div>
           </div>
         ))
       ) : null}
 
       <form action={logout} style={{ marginTop: 36 }}>
-        <button className="btn ghost" type="submit">خروج</button>
+        <button className="btn ghost wide" type="submit">خروج</button>
       </form>
     </main>
+    <BottomNav current="admin" />
+    </div>
   );
 }
