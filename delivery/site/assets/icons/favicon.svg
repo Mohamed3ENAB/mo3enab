@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="في السكة">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1AE2A0"/>
+      <stop offset="1" stop-color="#045C54"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <path d="M0 0h64L0 44Z" fill="#fff" opacity=".10"/>
+
+  <!-- السكة بمنظور -->
+  <path d="M26.4 22h11.2l8.4 34H18Z" fill="url(#road)"/>
+  <!-- الشرط المتقطّع -->
+  <g fill="#FFC64C">
+    <path d="M31.1 27h1.8l.5 5h-2.8Z"/>
+    <path d="M30.2 35h3.6l.6 6.4h-4.8Z"/>
+    <path d="M29.1 44.6h5.8l.8 7.4h-7.4Z"/>
+  </g>
+  <!-- دبوس المكان -->
+  <path d="M32 6a9 9 0 0 1 9 9c0 6-9 13.4-9 13.4S23 21 23 15a9 9 0 0 1 9-9Z" fill="#fff"/>
+  <circle cx="32" cy="15" r="3.6" fill="#067860"/>
+</svg>

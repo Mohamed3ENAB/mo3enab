@@ -1,0 +1,51 @@
+# في السكة — إعدادات أباتشي (هوستنجر وأي استضافة مشتركة)
+
+# ── اللينكات النضيفة ─────────────────────────────────────────
+RewriteEngine On
+
+# الملفات والمجلدات الموجودة فعلًا بتتقدّم زي ما هي
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# أي حاجة تانية بتروح للراوتر
+RewriteRule ^ index.php [L]
+
+# ── الحماية ──────────────────────────────────────────────────
+# 🔴 config.php فيه بيانات قاعدة البيانات — ممنوع يتقرا من المتصفح
+<FilesMatch "^(config\.php|config\.example\.php|\.installed|.*\.md|.*\.sql|.*\.mjs)$">
+  Require all denied
+</FilesMatch>
+
+# مجلدات الكود مش صفحات
+RedirectMatch 404 ^/(.*/)?(lib|sql|views)/
+
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(self), payment=()"
+  # الصور اللي جاية من img.php بتحدد الكاش بنفسها
+  <FilesMatch "\.(css|js|svg|webp|png|jpg|woff2)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/webp .webp
+</IfModule>
+
+# رفع الصور من الموبايل — الصور الكبيرة بتتصغّر في السيرفر
+<IfModule mod_php.c>
+  php_value upload_max_filesize 10M
+  php_value post_max_size 12M
+</IfModule>
+
+ErrorDocument 404 /index.php

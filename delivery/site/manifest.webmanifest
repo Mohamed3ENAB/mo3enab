@@ -1,0 +1,32 @@
+{
+  "name": "في السكة — سواقين ومحلات القيصرية",
+  "short_name": "في السكة",
+  "description": "دليل مجاني لسواقين ومحلات القيصرية والمناطق المجاورة. شوف مين متاح دلوقتي، اطلب، وتابع طلبك من حسابك.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F6F4",
+  "theme_color": "#06795F",
+  "categories": ["travel", "shopping", "lifestyle"],
+  "icons": [
+    { "src": "icon.php?s=64",       "sizes": "64x64",   "type": "image/png" },
+    { "src": "icon.php?s=128",      "sizes": "128x128", "type": "image/png" },
+    { "src": "icon.php?s=192",      "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon.php?s=256",      "sizes": "256x256", "type": "image/png" },
+    { "src": "icon.php?s=384",      "sizes": "384x384", "type": "image/png" },
+    { "src": "icon.php?s=512",      "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon.php?s=512&m=1",  "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icons/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "اطلب دلوقتي", "short_name": "اطلب", "url": "requests",
+      "icons": [{ "src": "icon.php?s=96", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "المحلات", "short_name": "المحلات", "url": "places",
+      "icons": [{ "src": "icon.php?s=96", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "حسابي", "short_name": "حسابي", "url": "dashboard",
+      "icons": [{ "src": "icon.php?s=96", "sizes": "96x96", "type": "image/png" }] }
+  ]
+}
