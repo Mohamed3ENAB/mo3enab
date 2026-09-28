@@ -1,0 +1,840 @@
+<title>في السكة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700;800&display=swap">
+<style>
+/* نظام التصميم نفسه بتاع التطبيق — delivery/web/src/app/globals.css */
+:root {
+  --brand-700:#00815A; --brand-600:#00A86B; --brand-500:#0FBF7F; --brand-400:#2BD99A;
+  --brand-tint:#E6F9F0;
+  --ink-900:#0B1220; --ink-700:#1C2736; --ink-600:#36425A; --ink-500:#5A6880;
+  --ink-400:#8A96AD; --ink-300:#B9C2D2;
+  --canvas:#F2F6F9; --surface:#FFFFFF; --line:#E6ECF2;
+  --amber:#FFB020; --amber-tint:#FFF6E3; --sky:#2E7DF6; --sky-tint:#E8F1FE;
+  --rose:#F0374B; --rose-tint:#FEECEE;
+  --hero:linear-gradient(135deg,#00815A 0%,#00A86B 45%,#2BD99A 100%);
+  --r-md:16px; --r-lg:22px; --r-full:999px;
+  --sh-card:0 1px 2px rgba(11,18,32,.04), 0 8px 24px -12px rgba(11,18,32,.16);
+  --sh-lift:0 2px 6px rgba(11,18,32,.06), 0 18px 40px -16px rgba(11,18,32,.28);
+  --sh-brand:0 8px 22px -8px rgba(0,168,107,.55);
+  --pad:16px; --tap:52px; --wrap:560px; --nav-h:66px;
+  --ease:cubic-bezier(.22,.9,.3,1);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --ink-900:#F2F6FA; --ink-700:#DDE5EE; --ink-600:#B4C0D0; --ink-500:#8E9BAE;
+  --ink-400:#6D7A8C; --ink-300:#4A5566;
+  --canvas:#070B12; --surface:#111826; --line:#202B3D;
+  --brand-tint:#06281D; --amber-tint:#2A2008; --sky-tint:#0B1D36; --rose-tint:#2A0F14;
+  --sh-card:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.8);
+  --sh-lift:0 2px 8px rgba(0,0,0,.55), 0 20px 44px -18px rgba(0,0,0,.9);
+} }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink-900:#F2F6FA; --ink-700:#DDE5EE; --ink-600:#B4C0D0; --ink-500:#8E9BAE;
+  --ink-400:#6D7A8C; --ink-300:#4A5566;
+  --canvas:#070B12; --surface:#111826; --line:#202B3D;
+  --brand-tint:#06281D; --amber-tint:#2A2008; --sky-tint:#0B1D36; --rose-tint:#2A0F14;
+  --sh-card:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.8);
+  --sh-lift:0 2px 8px rgba(0,0,0,.55), 0 20px 44px -18px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--canvas); color:var(--ink-900);
+  font-family:'Alexandria','Segoe UI',Tahoma,system-ui,sans-serif;
+  font-size:16px; line-height:1.55; direction:rtl; text-align:right;
+  -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent;
+  padding-bottom:calc(var(--nav-h) + 22px);
+}
+a{color:inherit;text-decoration:none} button{font:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--wrap);margin:0 auto}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+@keyframes ping{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(2.6);opacity:0}}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.rise{animation:rise .38s var(--ease) both}
+.pop{animation:pop .28s var(--ease) both}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* بانر التجربة */
+.demobar{
+  background:var(--ink-900); color:var(--canvas);
+  padding:9px var(--pad); font-size:12.5px; font-weight:700;
+  display:flex; gap:7px; align-items:center; justify-content:center; text-align:center;
+}
+.demobar span{opacity:.75;font-weight:400}
+
+.hero{background:var(--hero);color:#fff;padding:16px var(--pad) 54px;
+  border-end-start-radius:26px;border-end-end-radius:26px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset-block-start:-70px;inset-inline-start:-50px;
+  width:210px;height:210px;border-radius:50%;background:rgba(255,255,255,.09)}
+.hero>*{position:relative;z-index:1}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hero-brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px}
+.hero-logo{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.2);display:grid;place-items:center}
+.zonepick{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.26);border-radius:var(--r-full);padding:8px 14px;
+  color:#fff;font-size:14px;font-weight:600;min-height:40px}
+.hero h1{margin:16px 0 5px;font-size:clamp(21px,5.9vw,26px);font-weight:800;letter-spacing:-.02em;line-height:1.45;text-wrap:balance}
+.hero p{margin:0;font-size:15px;opacity:.88}
+
+.searchwrap{margin:-30px var(--pad) 0;position:relative;z-index:3}
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:var(--r-md);
+  box-shadow:var(--sh-lift);padding:0 16px;min-height:56px}
+.search input{flex:1;border:0;background:none;color:var(--ink-900);font:inherit;font-size:16px;min-width:0;padding:16px 0}
+.search input::placeholder{color:var(--ink-400)}
+.search input:focus{outline:none}
+.search svg{color:var(--ink-400);flex:0 0 auto}
+
+.sec{padding:20px var(--pad) 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:11px}
+.sec-head h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.01em}
+.sec-head .side{font-size:14px;color:var(--ink-500);font-weight:600;font-variant-numeric:tabular-nums}
+
+.services{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px var(--pad) 2px;
+  margin:0 calc(var(--pad)*-1);scroll-padding-inline:var(--pad)}
+.services::-webkit-scrollbar{display:none}
+.services::after{content:'';flex:0 0 8px}
+.svc{flex:0 0 auto;width:74px;display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:10px 4px;border-radius:var(--r-md);background:var(--surface);border:2px solid transparent;
+  box-shadow:var(--sh-card);transition:transform .18s var(--ease),border-color .18s var(--ease);cursor:pointer}
+.svc:active{transform:scale(.95)}
+.svc[aria-pressed="true"]{border-color:var(--brand-600)}
+.svc .bubble{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff}
+.svc span{font-size:12.5px;font-weight:700;color:var(--ink-700);text-align:center;line-height:1.25}
+.svc[aria-pressed="true"] span{color:var(--brand-700)}
+.b-all{background:linear-gradient(140deg,#36425A,#0B1220)}
+.b-delivery{background:linear-gradient(140deg,#00C07E,#00815A)}
+.b-tuktuk{background:linear-gradient(140deg,#FFC24D,#F08C00)}
+.b-goods{background:linear-gradient(140deg,#5B9BFF,#2452D6)}
+.b-bicycle{background:linear-gradient(140deg,#4FD1D9,#12879B)}
+.b-mahalla{background:linear-gradient(140deg,#B07CFF,#6D2FD4)}
+.b-restaurant{background:linear-gradient(140deg,#FF8A5B,#E0452B)}
+.b-supermarket{background:linear-gradient(140deg,#5B9BFF,#2452D6)}
+.b-grocery{background:linear-gradient(140deg,#00C07E,#00815A)}
+.b-herbalist{background:linear-gradient(140deg,#8FD14F,#46811F)}
+.b-bakery{background:linear-gradient(140deg,#FFC24D,#D98A00)}
+.b-butcher{background:linear-gradient(140deg,#FF7A8A,#C42A48)}
+.b-produce{background:linear-gradient(140deg,#7ED957,#2E9E3E)}
+.b-pharmacy{background:linear-gradient(140deg,#4FD1D9,#0E7C8C)}
+.b-stationery{background:linear-gradient(140deg,#B07CFF,#6D2FD4)}
+
+.zones{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.zones::-webkit-scrollbar{display:none}
+.zones::after{content:'';flex:0 0 8px}
+.zchip{flex:0 0 auto;min-height:40px;display:inline-flex;align-items:center;padding:0 15px;
+  border-radius:var(--r-full);background:var(--surface);border:1.5px solid var(--line);
+  color:var(--ink-600);font-size:14.5px;font-weight:700;cursor:pointer;transition:transform .16s var(--ease)}
+.zchip:active{transform:scale(.95)}
+.zchip[aria-pressed="true"]{background:var(--ink-900);border-color:var(--ink-900);color:var(--canvas)}
+
+.cards{display:flex;flex-direction:column;gap:12px}
+.row{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-card);padding:15px;
+  display:grid;grid-template-columns:auto 1fr;gap:13px;border:1.5px solid transparent}
+.row.live{border-color:rgba(0,168,107,.3)}
+.avatar{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;
+  font-weight:800;font-size:20px;color:#fff;position:relative;flex:0 0 auto}
+.avatar .vbadge{position:absolute;inset-block-end:-4px;inset-inline-end:-4px;width:22px;height:22px;
+  border-radius:50%;background:var(--sky);color:#fff;display:grid;place-items:center;border:2.5px solid var(--surface)}
+.row .head{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.row h3{margin:0;font-size:17.5px;font-weight:800;letter-spacing:-.01em}
+.rate{display:inline-flex;align-items:center;gap:3px;background:var(--amber-tint);color:#8A5B00;
+  border-radius:var(--r-full);padding:2px 8px;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rate{color:var(--amber)}}
+:root[data-theme="dark"] .rate{color:var(--amber)}
+.row .meta{margin:5px 0 0;color:var(--ink-500);font-size:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.row .subnote{margin:3px 0 0;color:var(--ink-400);font-size:13.5px;line-height:1.5}
+.state{display:inline-flex;align-items:center;gap:7px;border-radius:var(--r-full);
+  padding:5px 11px 5px 9px;font-size:13px;font-weight:800;margin-top:9px}
+.state.on{background:var(--brand-tint);color:var(--brand-700)}
+.state.off{background:var(--canvas);color:var(--ink-500)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .state.on{color:var(--brand-400)}}
+:root[data-theme="dark"] .state.on{color:var(--brand-400)}
+.state .since{font-weight:500;opacity:.8}
+.beacon{position:relative;width:9px;height:9px;flex:0 0 auto}
+.beacon i{position:absolute;inset:0;border-radius:50%;background:currentColor}
+.state.on .beacon i:first-child{animation:ping 1.9s var(--ease) infinite}
+.row .actions{display:flex;gap:9px;margin-top:13px}
+
+.btn{min-height:var(--tap);display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:0 18px;border-radius:14px;border:0;background:var(--ink-900);color:var(--canvas);
+  font-size:16px;font-weight:800;cursor:pointer;transition:transform .16s var(--ease)}
+.btn:active{transform:scale(.96)}
+.btn.call{background:var(--brand-600);color:#fff;box-shadow:var(--sh-brand);white-space:nowrap}
+.row .btn.call{flex:1 1 auto;min-width:0;padding:0 12px}
+.btn.wa{background:#25D366;color:#fff;flex:0 0 auto;width:54px;padding:0}
+.btn.ghost{background:var(--surface);color:var(--ink-900);border:1.5px solid var(--line)}
+.btn.quiet{background:var(--canvas);color:var(--ink-600);font-size:14.5px;font-weight:700;
+  min-height:44px;padding:0 14px;border-radius:12px}
+.btn.wide{width:100%}
+
+.empty{background:var(--surface);border-radius:var(--r-lg);padding:32px 22px;text-align:center;box-shadow:var(--sh-card)}
+.empty .ill{width:68px;height:68px;border-radius:24px;margin:0 auto 16px;background:var(--brand-tint);
+  color:var(--brand-600);display:grid;place-items:center}
+.empty h3{margin:0 0 7px;font-size:18px;font-weight:800}
+.empty p{margin:0 0 18px;color:var(--ink-500);font-size:15px}
+
+.nav{position:fixed;inset-inline:0;bottom:0;z-index:40;background:var(--surface);
+  border-block-start:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);
+  box-shadow:0 -6px 24px -14px rgba(11,18,32,.3)}
+.nav ul{max-width:var(--wrap);margin:0 auto;padding:0;list-style:none;display:grid;grid-template-columns:repeat(4,1fr)}
+.nav button{width:100%;height:var(--nav-h);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:4px;color:var(--ink-400);font-size:11.5px;font-weight:700;
+  background:none;border:0;cursor:pointer;transition:color .18s var(--ease)}
+.nav button[aria-current="page"]{color:var(--brand-600)}
+.nav .ic{transition:transform .2s var(--ease)}
+.nav button[aria-current="page"] .ic{transform:translateY(-2px)}
+
+.page{padding:20px var(--pad) 26px}
+.page h1{font-size:24px;font-weight:800;margin:0 0 6px;letter-spacing:-.02em;text-wrap:balance}
+.page h2{font-size:17px;font-weight:800;margin:26px 0 12px}
+.page .lede{color:var(--ink-500);margin:0 0 18px;font-size:15px}
+.card{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-card);padding:18px;margin-bottom:14px}
+
+.field{display:block;margin-bottom:14px}
+.field>span{display:block;font-weight:700;font-size:14px;margin-bottom:7px;color:var(--ink-700)}
+.field input,.field textarea,.field select{width:100%;min-height:var(--tap);padding:13px 15px;
+  border:1.5px solid var(--line);border-radius:14px;background:var(--canvas);color:var(--ink-900);
+  font:inherit;font-size:16px;transition:border-color .18s var(--ease)}
+.field textarea{min-height:104px;resize:vertical;line-height:1.6}
+.field :is(input,textarea,select):focus{border-color:var(--brand-600);outline:none}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks label{display:inline-flex;align-items:center;gap:7px;min-height:44px;border:1.5px solid var(--line);
+  border-radius:var(--r-full);padding:8px 14px;font-size:14.5px;font-weight:700;cursor:pointer;background:var(--surface)}
+.checks input{width:18px;height:18px;accent-color:var(--brand-600)}
+
+.note{display:flex;gap:11px;background:var(--sky-tint);color:var(--ink-700);border-radius:var(--r-md);
+  padding:14px 15px;margin:0 0 16px;font-size:14.5px;line-height:1.6}
+.note .ic{color:var(--sky);flex:0 0 auto;margin-top:2px}
+.note.warn{background:var(--rose-tint)} .note.warn .ic{color:var(--rose)}
+.note strong{font-weight:800}
+.msg{display:flex;align-items:center;gap:9px;padding:13px 15px;border-radius:14px;margin-bottom:16px;
+  font-weight:700;font-size:14.5px;background:var(--brand-tint);color:var(--brand-700)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .msg{color:var(--brand-400)}}
+:root[data-theme="dark"] .msg{color:var(--brand-400)}
+
+.rates{display:flex;flex-direction:column;gap:10px}
+.rate-row{display:flex;align-items:center;gap:13px;background:var(--surface);border-radius:var(--r-md);
+  box-shadow:var(--sh-card);padding:13px 15px}
+.rate-row .bubble{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.rate-row .t{flex:1;min-width:0}
+.rate-row .t b{display:block;font-size:15.5px;font-weight:800}
+.rate-row .t span{color:var(--ink-500);font-size:13px}
+.rate-row .v{text-align:center;flex:0 0 auto}
+.rate-row .v em{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--ink-400)}
+.rate-row .v b{font-size:21px;font-weight:800;color:var(--brand-700);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rate-row .v b{color:var(--brand-400)}}
+:root[data-theme="dark"] .rate-row .v b{color:var(--brand-400)}
+
+.price{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}
+.price:last-child{border-bottom:0}
+.price .bubble{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.price .t{flex:1;min-width:0}
+.price .t b{display:block;font-size:15.5px;font-weight:800}
+.price .t span{color:var(--ink-500);font-size:13.5px}
+.price .v{font-weight:800;font-size:16px;white-space:nowrap;color:var(--brand-700);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .price .v{color:var(--brand-400)}}
+:root[data-theme="dark"] .price .v{color:var(--brand-400)}
+
+.req{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-card);padding:16px;margin-bottom:12px}
+.req p{margin:0 0 11px;font-size:15.5px;line-height:1.6}
+.req .when{display:flex;align-items:center;gap:7px;color:var(--ink-400);font-size:13px;font-weight:600;flex-wrap:wrap}
+.pill{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:var(--r-full);background:var(--sky-tint);color:var(--sky)}
+
+.toggle{width:100%;min-height:150px;border:0;border-radius:24px;cursor:pointer;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:9px;font-size:25px;font-weight:800;
+  color:#fff;position:relative;overflow:hidden;
+  transition:transform .2s var(--ease),box-shadow .3s var(--ease),background .3s var(--ease)}
+.toggle.on{background:var(--hero);box-shadow:0 16px 40px -14px rgba(0,168,107,.75)}
+.toggle.off{background:linear-gradient(140deg,#5A6880,#36425A);box-shadow:var(--sh-card)}
+.toggle:active{transform:scale(.97)}
+.toggle small{font-size:14px;font-weight:600;opacity:.92}
+.toggle .ring{position:absolute;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.3)}
+.toggle.on .ring{animation:ping 2.6s var(--ease) infinite}
+
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(11,18,32,.5);animation:fadeIn .22s var(--ease) both;
+  display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:var(--wrap);background:var(--surface);
+  border-start-start-radius:26px;border-start-end-radius:26px;
+  padding:10px var(--pad) calc(22px + env(safe-area-inset-bottom,0px));
+  animation:sheetUp .3s var(--ease) both;max-height:86vh;overflow-y:auto}
+.grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 16px}
+.step{display:flex;gap:12px;margin-bottom:16px}
+.step .n{width:28px;height:28px;border-radius:50%;flex:0 0 auto;background:var(--brand-600);color:#fff;
+  display:grid;place-items:center;font-size:14px;font-weight:800}
+.step .c{flex:1;min-width:0}
+.step .c b{display:block;font-size:15.5px;font-weight:800;margin-bottom:3px}
+.step .c p{margin:0 0 10px;color:var(--ink-500);font-size:14px;line-height:1.55}
+.mini{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.mini:last-child{border-bottom:0}
+.mini .t{flex:1;min-width:0}
+.mini .t b{display:block;font-size:15px;font-weight:800}
+.mini .t span{color:var(--ink-500);font-size:12.5px}
+
+/* الرقم كنص يتنسخ — روابط tel: مش مضمونة جوه صفحة زي دي */
+.telbox{display:flex;align-items:center;gap:10px;background:var(--canvas);border:1.5px solid var(--line);
+  border-radius:14px;padding:11px 14px;margin-top:10px}
+.telbox .num{flex:1;font-weight:800;font-size:17px;letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;direction:ltr;text-align:left;user-select:all}
+.telbox button{background:var(--brand-600);color:#fff;border:0;border-radius:11px;padding:9px 14px;
+  font-size:14px;font-weight:800;cursor:pointer;min-height:42px;white-space:nowrap}
+
+.foot{padding:22px var(--pad) 8px;color:var(--ink-400);font-size:13px;line-height:1.7}
+.foot p{margin:0 0 9px}
+.foot strong{color:var(--ink-600)}
+</style>
+
+<div class="demobar">
+  نسخة تجريبية <span>· الأسماء والأرقام دي مش حقيقية</span>
+</div>
+
+<div id="app"></div>
+
+<nav class="nav" aria-label="التنقل">
+  <ul>
+    <li><button data-tab="home" aria-current="page">
+      <svg class="ic" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.3V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.3"/></svg>
+      السواقين</button></li>
+    <li><button data-tab="places">
+      <svg class="ic" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5V20a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1V9.5"/><path d="M2.5 9.5 4.4 4.2A1.6 1.6 0 0 1 5.9 3h12.2a1.6 1.6 0 0 1 1.5 1.2l1.9 5.3a3 3 0 0 1-5.7 1.3 3 3 0 0 1-5.6 0 3 3 0 0 1-5.7-1.3Z"/><path d="M9.5 21v-5.5h5V21"/></svg>
+      المحلات</button></li>
+    <li><button data-tab="requests">
+      <svg class="ic" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="17" rx="3"/><path d="M8 2.5v3M16 2.5v3M8 11h8M8 15.5h5"/></svg>
+      الطلبات</button></li>
+    <li><button data-tab="prices">
+      <svg class="ic" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12.5" rx="3"/><circle cx="12" cy="12.2" r="2.6"/><path d="M6 12.2v0M18 12.2v0"/></svg>
+      الأسعار</button></li>
+  </ul>
+</nav>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- أيقونات ---------- */
+const S = (d, sw = 2) =>
+  `<svg width="{{s}}" height="{{s}}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ico = {
+  delivery: S('<circle cx="5" cy="17" r="3.2"/><circle cx="19" cy="17" r="3.2"/><path d="M8.2 17h7.2l-4-6H7"/><path d="M14 8h3l2.4 6"/><path d="M6.4 11H4"/>'),
+  tuktuk: S('<circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8.4 18h7.2"/><path d="M6 15.6V11a5 5 0 0 1 5-5h3.2a5 5 0 0 1 5 5v4.6"/><path d="M6.4 9.6 4 8.4"/><path d="M10.8 6V4"/>'),
+  goods: S('<path d="M20.5 7.8v8.4a1.6 1.6 0 0 1-.8 1.4l-6.9 3.9a1.6 1.6 0 0 1-1.6 0l-6.9-3.9a1.6 1.6 0 0 1-.8-1.4V7.8a1.6 1.6 0 0 1 .8-1.4l6.9-3.9a1.6 1.6 0 0 1 1.6 0l6.9 3.9a1.6 1.6 0 0 1 .8 1.4Z"/><path d="m3.7 7 8.3 4.7L20.3 7"/><path d="M12 21v-9.3"/>'),
+  bicycle: S('<circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M5.5 17.5 9 8h4l3.2 9.5"/><path d="M9 8h6"/><path d="M13 8l-2.4 9.5"/>'),
+  mahalla_run: S('<path d="M3 21h18"/><path d="M5 21V8l5-3v16"/><path d="M14 21V11l5 2.5V21"/><path d="M7.5 10.5v0M7.5 14v0M16.5 16v0"/>'),
+  all: S('<rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/>'),
+  restaurant: S('<path d="M6 3v7a2.5 2.5 0 0 0 5 0V3"/><path d="M8.5 10.5V21"/><path d="M17.5 3c-1.4 1.4-2 3.3-2 5.2 0 1.6.7 2.8 2 3.3V21"/>'),
+  supermarket: S('<circle cx="9.5" cy="19.5" r="1.6"/><circle cx="17.5" cy="19.5" r="1.6"/><path d="M2.5 3h2.6l2.4 12.2a1.6 1.6 0 0 0 1.6 1.3h8.4a1.6 1.6 0 0 0 1.6-1.3l1.4-7.4H6"/>'),
+  grocery: S('<path d="M3.5 9.5V20a1 1 0 0 0 1 1h15a1 1 0 0 0 1-1V9.5"/><path d="M2.5 9.5 4.4 4.2A1.6 1.6 0 0 1 5.9 3h12.2a1.6 1.6 0 0 1 1.5 1.2l1.9 5.3a3 3 0 0 1-5.7 1.3 3 3 0 0 1-5.6 0 3 3 0 0 1-5.7-1.3Z"/><path d="M9.5 21v-5.5h5V21"/>'),
+  herbalist: S('<path d="M12 21V11"/><path d="M12 11c0-4 2.6-7.4 6.4-8.2C19 6.8 16.6 11 12 11Z"/><path d="M12 15c-3.4 0-5.8-2.4-6.2-5.6C8.9 10 12 12 12 15Z"/>'),
+  bakery: S('<path d="M4 10.5C4 7.5 7.6 5.5 12 5.5s8 2 8 5c0 1.4-1.1 2.2-2.2 2.2V19a1 1 0 0 1-1 1H7.2a1 1 0 0 1-1-1v-6.3C5.1 12.7 4 11.9 4 10.5Z"/><path d="M9 9.2v3.2M15 9.2v3.2"/>'),
+  butcher: S('<path d="M7.6 20.4a5.5 5.5 0 0 1-3.6-8.6l7-8.5a4.6 4.6 0 0 1 7.6 5l-1.4 2.3"/><path d="M13.5 20.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M13.5 17v0"/>'),
+  produce: S('<path d="M12 8.5c-3.6-2.7-8 0-8 4.6 0 3.6 3 7.4 5.6 7.4 1 0 1.6-.5 2.4-.5s1.4.5 2.4.5c2.6 0 5.6-3.8 5.6-7.4 0-4.6-4.4-7.3-8-4.6Z"/><path d="M12 8.5V5.2M12 5.2c2.2 0 3-1.4 3-2.7-1.8 0-3 1-3 2.7Z"/>'),
+  pharmacy: S('<rect x="3" y="3.5" width="18" height="17" rx="4"/><path d="M12 8v8M8 12h8"/>'),
+  stationery: S('<path d="M4 4.5A2 2 0 0 1 6 2.5h13v16H6a2 2 0 0 0-2 2Z"/><path d="M4 18.5V21h15"/><path d="M8.5 7h6"/>'),
+  phone: S('<path d="M21 16.9v2.6a1.8 1.8 0 0 1-2 1.8 17.6 17.6 0 0 1-7.7-2.7 17.4 17.4 0 0 1-5.3-5.3A17.6 17.6 0 0 1 3.3 5.5 1.8 1.8 0 0 1 5.1 3.5h2.6a1.8 1.8 0 0 1 1.8 1.6 11.4 11.4 0 0 0 .6 2.5 1.8 1.8 0 0 1-.4 1.9l-1.1 1.1a14.4 14.4 0 0 0 5.4 5.4l1.1-1.1a1.8 1.8 0 0 1 1.9-.4 11.4 11.4 0 0 0 2.5.6 1.8 1.8 0 0 1 1.6 1.8Z"/>'),
+  search: S('<circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4-4"/>'),
+  pin: S('<path d="M20 10.5c0 5.5-8 11.5-8 11.5s-8-6-8-11.5a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10.5" r="2.8"/>'),
+  clock: S('<circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2"/>'),
+  info: S('<circle cx="12" cy="12" r="9.2"/><path d="M12 11v5.5M12 7.7v0"/>'),
+  alert: S('<path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4M12 17v0"/>'),
+  shield: S('<path d="M12 2.5 4.5 5.6v6c0 4.5 3.1 8.6 7.5 9.9 4.4-1.3 7.5-5.4 7.5-9.9v-6Z"/><path d="m9 12 2.2 2.2L15.2 10"/>'),
+  sleep: S('<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"/>', 1.7),
+  check: S('<path d="m4.5 12.5 5 5 10-11"/>', 3.4),
+  logo: '<svg width="{{s}}" height="{{s}}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="4" width="4" height="16" rx="2"/><rect x="10" y="4" width="11" height="3.6" rx="1.8" opacity=".95"/><rect x="10" y="10.2" width="8" height="3.6" rx="1.8" opacity=".7"/><rect x="10" y="16.4" width="5" height="3.6" rx="1.8" opacity=".45"/></svg>',
+  star: '<svg width="{{s}}" height="{{s}}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.6 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9Z"/></svg>',
+  wa: '<svg width="{{s}}" height="{{s}}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2s-1.2.3-3.9-.9a13.4 13.4 0 0 1-5.3-5.3c-.5-.9-.9-1.9-.9-2.8s.5-1.5.8-1.8a.9.9 0 0 1 .6-.2h.5c.2 0 .4 0 .6.5l.8 2c.1.2 0 .4 0 .5l-.4.5-.3.3c-.1.2-.2.3 0 .6a9.4 9.4 0 0 0 1.7 2.1 8.5 8.5 0 0 0 2.4 1.5c.3.2.5.1.6 0l1-1.1c.2-.2.4-.2.6-.1l2 1c.2.1.4.2.4.3a2 2 0 0 1-.1.8Z"/></svg>',
+};
+const I = (name, size = 22) => (ico[name] || '').replaceAll('{{s}}', size);
+
+/* ---------- بيانات التجربة (مش حقيقية) ---------- */
+const ZONES = ['القيصرية', 'بطينة', 'محلة أبو علي', 'محلة زياد', 'المحلة الكبرى'];
+const SERVICE = { delivery:'دليفري', tuktuk:'توك توك', mahalla_run:'مشوار المحلة', goods:'نقل بضاعة', bicycle:'عجلة' };
+const SERVICE_ORDER = ['delivery','tuktuk','mahalla_run','goods','bicycle'];
+const CAT = { restaurant:'مطاعم', supermarket:'سوبر ماركت', grocery:'بقالة', produce:'خضار وفاكهة',
+  bakery:'مخبز', herbalist:'عطارة', butcher:'جزارة', pharmacy:'صيدلية', stationery:'مكتبة' };
+
+const MIN = 60000;
+const DRIVERS = [
+  { id:'d1', name:'محمود السيد', phone:'01021110001', wa:true, zone:'القيصرية', svc:['delivery','goods'], veh:'موتوسيكل', note:'بيشتغل من 12 لـ 10', ok:true, rate:'4.7', n:3, ago:14 },
+  { id:'d2', name:'كريم أبو زيد', phone:'01021110002', wa:false, zone:'القيصرية', svc:['tuktuk','goods'], veh:'توك توك', note:null, ok:true, rate:'4.5', n:4, ago:41 },
+  { id:'d3', name:'أحمد فرغلي', phone:'01021110003', wa:true, zone:'القيصرية', svc:['delivery','mahalla_run'], veh:'موتوسيكل', note:'بيروح المحلة يوميًا', ok:true, rate:'5.0', n:2, ago:96 },
+  { id:'d4', name:'يوسف عبد الله', phone:'01021110004', wa:false, zone:'القيصرية', svc:['bicycle','delivery'], veh:'عجلة', note:'الطلبات القريبة بس', ok:false, rate:null, n:0, ago:300 },
+  { id:'d5', name:'سيد الشناوي', phone:'01021110005', wa:true, zone:'بطينة', svc:['delivery'], veh:'موتوسيكل', note:null, ok:true, rate:null, n:0, ago:600 },
+  { id:'d6', name:'عماد رزق', phone:'01021110006', wa:false, zone:'محلة أبو علي', svc:['tuktuk'], veh:'توك توك أحمر', note:null, ok:false, rate:null, n:0, ago:1500 },
+];
+const PLACES = [
+  { id:'p1', name:'مطعم الشرقاوي', cat:'restaurant', zone:'القيصرية', phone:'01055550001', wa:true, addr:'شارع الجامع الكبير', hrs:'من 12ظ لـ 1 بالليل', note:'فراخ ولحمة مشوية', rate:'4.6', n:12 },
+  { id:'p2', name:'كشري أم محمد', cat:'restaurant', zone:'القيصرية', phone:'01055550002', wa:false, addr:'أول شارع المحطة', hrs:'من 11ص لـ 11م', note:null, rate:'4.8', n:8 },
+  { id:'p3', name:'سوبر ماركت النور', cat:'supermarket', zone:'القيصرية', phone:'01055550003', wa:true, addr:'قدام الوحدة الصحية', hrs:'من 8ص لـ 12م', note:'بيوصّل بنفسه أحيانًا', rate:null, n:0 },
+  { id:'p4', name:'بقالة الحاج سيد', cat:'grocery', zone:'بطينة', phone:'01055550004', wa:false, addr:'وسط البلد', hrs:'من 7ص لـ 11م', note:null, rate:null, n:0 },
+  { id:'p5', name:'عطارة الشفاء', cat:'herbalist', zone:'القيصرية', phone:'01055550005', wa:true, addr:'جنب مسجد النصر', hrs:'من 9ص لـ 10م', note:'أعشاب وتوابل', rate:'4.9', n:5 },
+  { id:'p6', name:'مكتبة الأمل', cat:'stationery', zone:'القيصرية', phone:'01055550006', wa:false, addr:'شارع المدرسة', hrs:'من 8ص لـ 9م', note:'أدوات مدرسية وتصوير', rate:null, n:0 },
+  { id:'p7', name:'صيدلية د. هالة', cat:'pharmacy', zone:'القيصرية', phone:'01055550007', wa:true, addr:'ميدان البلد', hrs:'24 ساعة', note:null, rate:'4.7', n:9 },
+  { id:'p8', name:'فرن البركة', cat:'bakery', zone:'محلة أبو علي', phone:'01055550008', wa:false, addr:'أول الطريق', hrs:'من 5ص لـ 2ظ', note:null, rate:null, n:0 },
+  { id:'p9', name:'خضار وفاكهة الجمل', cat:'produce', zone:'القيصرية', phone:'01055550009', wa:false, addr:'السوق', hrs:'من 6ص لـ 8م', note:null, rate:null, n:0 },
+  { id:'p10', name:'جزارة الأمانة', cat:'butcher', zone:'بطينة', phone:'01055550010', wa:true, addr:'جنب البقالة', hrs:'من 9ص لـ 9م', note:null, rate:null, n:0 },
+];
+const RATES = [
+  { k:'bicycle', from:5, note:'للطلبات القريبة جوه البلد' },
+  { k:'delivery', from:10, note:'موتوسيكل — جوه البلد والقرى القريبة' },
+  { k:'tuktuk', from:15, note:'للحاجات اللي محتاجة مساحة' },
+  { k:'goods', from:20, note:'حسب الحجم والوزن — اتفق قبل' },
+  { k:'mahalla_run', from:70, note:'ذهاب وعودة للمحلة الكبرى' },
+];
+const PRICES = [
+  { k:'delivery', t:'جوه القيصرية', s:'حسب المسافة جوه البلد', lo:20, hi:35 },
+  { k:'delivery', t:'القيصرية ← بطينة', s:'بين القرى المتجاورة', lo:35, hi:50 },
+  { k:'delivery', t:'القيصرية ← محلة أبو علي', s:'بين القرى المتجاورة', lo:35, hi:50 },
+  { k:'mahalla_run', t:'القيصرية ← المحلة الكبرى', s:'ذهاب وعودة — الانتظار الطويل بيزوّد', lo:70, hi:100 },
+  { k:'bicycle', t:'جوه القيصرية بالعجلة', s:'للطلبات القريبة', lo:15, hi:25 },
+];
+const SEED_REQS = [
+  { id:'r1', body:'محتاج حد يجيبلي دوا من صيدلية في المحلة النهاردة بالليل، وهدفع تمن الدوا والمشوار.', zone:'القيصرية', kind:'mahalla_run', phone:'01099990001', hide:true, ago:12 },
+];
+
+/* ---------- الحالة ---------- */
+const LS = 'sekka-demo-v1';
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch { saved = {}; }
+const save = () => {
+  try { localStorage.setItem(LS, JSON.stringify({ off: st.off, reqs: st.reqs })); } catch {}
+};
+
+const st = {
+  tab: 'home',
+  zone: null, kind: null, term: '',
+  cat: null, pzone: null, pterm: '',
+  off: saved.off || {},                    // تغييرات التوفر اللي المستخدم عملها
+  reqs: saved.reqs || [],                  // الطلبات اللي المستخدم نشرها
+  sheet: null,
+  toast: null,
+};
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+const since = (mins) => {
+  if (mins < 1) return 'دلوقتي';
+  if (mins === 1) return 'من دقيقة';
+  if (mins === 2) return 'من دقيقتين';
+  if (mins < 11) return `من ${mins} دقايق`;
+  if (mins < 60) return `من ${mins} دقيقة`;
+  const h = Math.floor(mins / 60);
+  if (h === 1) return 'من ساعة';
+  if (h === 2) return 'من ساعتين';
+  if (h < 11) return `من ${h} ساعات`;
+  if (h < 24) return `من ${h} ساعة`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? 'من إمبارح' : `من ${d} يوم`;
+};
+
+// التوفر بينتهي لوحده بعد ٤ ساعات — نفس قاعدة التطبيق
+const liveOf = (d) => {
+  const o = st.off[d.id];
+  if (o) return o.on && (Date.now() - o.at) < 4 * 60 * MIN;
+  return d.ok && d.ago < 240;
+};
+const agoOf = (d) => {
+  const o = st.off[d.id];
+  return o ? Math.floor((Date.now() - o.at) / MIN) : d.ago;
+};
+const waLink = (phone, text) =>
+  `https://wa.me/2${phone.replace(/^0/, '')}${text ? '?text=' + encodeURIComponent(text) : ''}`;
+
+/* ---------- قطع مشتركة ---------- */
+const AV = (name, cls) => {
+  const pal = ['linear-gradient(140deg,#00C07E,#00815A)','linear-gradient(140deg,#5B9BFF,#2452D6)',
+    'linear-gradient(140deg,#FFC24D,#F08C00)','linear-gradient(140deg,#B07CFF,#6D2FD4)',
+    'linear-gradient(140deg,#4FD1D9,#12879B)','linear-gradient(140deg,#FF8A8A,#D63030)'];
+  let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return `<span class="avatar" style="background:${pal[h % pal.length]}">${esc(name.trim()[0])}
+    ${cls ? `<span class="vbadge">${I('check', 12)}</span>` : ''}</span>`;
+};
+const telBox = (phone) => `<div class="telbox">
+  <span class="num">${esc(phone)}</span>
+  <button data-copy="${esc(phone)}">انسخ الرقم</button></div>`;
+
+/* ---------- شاشة السواقين ---------- */
+function viewHome() {
+  const list = DRIVERS.filter((d) =>
+    (st.zone === null || d.zone === st.zone) &&
+    (st.kind === null || d.svc.includes(st.kind)) &&
+    (st.term === '' || d.name.includes(st.term) || (d.veh || '').includes(st.term)));
+  const live = list.filter(liveOf), off = list.filter((d) => !liveOf(d));
+  const n = DRIVERS.filter(liveOf).length;
+  const where = st.zone ? `في ${st.zone}` : 'في القرى الخمسة';
+
+  const card = (d, i) => `
+    <article class="row rise${liveOf(d) ? ' live' : ''}" style="animation-delay:${Math.min(i,8)*50}ms">
+      ${AV(d.name, d.ok)}
+      <div>
+        <div class="head"><h3>${esc(d.name)}</h3>
+          ${d.rate ? `<span class="rate">${I('star',13)} ${d.rate}</span>` : ''}</div>
+        <p class="meta">${I(d.svc[0],16)} ${esc(d.veh)} ${I('pin',13)} ${esc(d.zone)}</p>
+        <p class="subnote">${d.svc.map((s) => SERVICE[s]).join('، ')}</p>
+        ${d.note ? `<p class="subnote">${esc(d.note)}</p>` : ''}
+        <span class="state ${liveOf(d) ? 'on' : 'off'}">
+          <span class="beacon"><i></i><i></i></span>
+          ${liveOf(d) ? 'متاح' : 'مش متاح'}<span class="since">${since(agoOf(d))}</span></span>
+        <div class="actions">
+          <button class="btn call" data-sheet="driver:${d.id}">${I('phone',20)} اتصال</button>
+          ${d.wa ? `<a class="btn wa" href="${waLink(d.phone,'السلام عليكم، لقيت رقمك في «في السكة»')}"
+            target="_blank" rel="noreferrer" aria-label="واتساب ${esc(d.name)}">${I('wa',22)}</a>` : ''}
+        </div>
+      </div>
+    </article>`;
+
+  return `
+  <header class="hero">
+    <div class="hero-top">
+      <div class="hero-brand"><span class="hero-logo">${I('logo',20)}</span> في السكة</div>
+      <span class="zonepick">${I('pin',15)} القيصرية</span>
+    </div>
+    <h1>${n === 0 ? 'مفيش حد متاح دلوقتي' : n === 1 ? 'سائق واحد متاح دلوقتي'
+      : n === 2 ? 'سائقين متاحين دلوقتي' : `${n} سواقين متاحين دلوقتي`}</h1>
+    <p>اضغط اتصال وكلّمه على طول — من غير عمولة ولا وسيط.</p>
+  </header>
+  <main class="wrap">
+    <div class="searchwrap"><div class="search">${I('search',21)}
+      <input id="q-home" type="search" value="${esc(st.term)}" placeholder="دوّر على اسم سائق أو مركبة" aria-label="بحث"></div></div>
+
+    <section class="sec"><div class="sec-head"><h2>الخدمات</h2></div>
+      <div class="services">
+        <button class="svc" data-kind="" aria-pressed="${st.kind === null}">
+          <span class="bubble b-all">${I('all',22)}</span><span>الكل</span></button>
+        ${SERVICE_ORDER.map((k) => `<button class="svc" data-kind="${k}" aria-pressed="${st.kind === k}">
+          <span class="bubble b-${k === 'mahalla_run' ? 'mahalla' : k}">${I(k,22)}</span>
+          <span>${SERVICE[k]}</span></button>`).join('')}
+      </div></section>
+
+    <section class="sec"><div class="zones">
+      <button class="zchip" data-zone="" aria-pressed="${st.zone === null}">كل القرى</button>
+      ${ZONES.map((z) => `<button class="zchip" data-zone="${esc(z)}" aria-pressed="${st.zone === z}">${esc(z)}</button>`).join('')}
+    </div></section>
+
+    <section class="sec">
+      <div class="sec-head"><h2>${live.length ? `متاحين دلوقتي ${where}` : `مفيش حد متاح ${where}`}</h2>
+        ${live.length ? `<span class="side">${live.length}</span>` : ''}</div>
+      ${live.length
+        ? `<div class="cards">${live.map(card).join('')}</div>`
+        : `<div class="empty pop"><div class="ill">${I('sleep',30)}</div>
+            <h3>مفيش حد فاتح دلوقتي</h3>
+            <p>جرّب قرية جنبك، أو اكتب طلبك واللي هيفتح هيشوفه.</p>
+            <button class="btn call wide" data-go="requests">اكتب طلبك</button></div>`}
+      ${off.length ? `<div class="sec-head" style="margin:22px 0 11px"><h2>مش متاحين دلوقتي</h2>
+        <span class="side">${off.length}</span></div>
+        <div class="cards">${off.map(card).join('')}</div>` : ''}
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><h2>جرّب كأنك سائق</h2></div>
+      <div class="card">
+        <p class="lede">في التطبيق الحقيقي كل سائق بياخد لينك سري، يفتحه ويضغط زرار واحد.
+          دوس هنا وشوف «${esc(DRIVERS[0].name)}» بيتحرك في القايمة فوق.</p>
+        <button class="toggle ${liveOf(DRIVERS[0]) ? 'on' : 'off'}" data-toggle="d1">
+          ${liveOf(DRIVERS[0]) ? '<span class="ring"></span>' : ''}
+          ${liveOf(DRIVERS[0]) ? 'أنا متاح' : 'مش متاح'}
+          <small>${liveOf(DRIVERS[0]) ? 'اضغط لما تخلص' : 'اضغط لما تبقى فاضي'}</small>
+        </button>
+        <p class="lede" style="margin:14px 0 0;text-align:center">
+          بيتقفل لوحده بعد ٤ ساعات لو نسيت — عشان القايمة تفضل صادقة.</p>
+      </div>
+    </section>
+    ${foot()}
+  </main>`;
+}
+
+/* ---------- شاشة المحلات ---------- */
+function viewPlaces() {
+  const list = PLACES.filter((p) =>
+    (st.cat === null || p.cat === st.cat) &&
+    (st.pzone === null || p.zone === st.pzone) &&
+    (st.pterm === '' || p.name.includes(st.pterm) || (p.addr || '').includes(st.pterm)));
+  const cats = [...new Set(PLACES.map((p) => p.cat))];
+
+  return `
+  <header class="hero">
+    <div class="hero-top">
+      <div class="hero-brand"><span class="hero-logo">${I('grocery',20)}</span> المحلات والمطاعم</div>
+      <span class="zonepick">${I('pin',15)} القيصرية</span>
+    </div>
+    <h1>اطلب من أي محل في البلد</h1>
+    <p>كلّم المحل واطلب، وبعدين كلّم سائق يستلم منهم.</p>
+  </header>
+  <main class="wrap">
+    <div class="searchwrap"><div class="search">${I('search',21)}
+      <input id="q-places" type="search" value="${esc(st.pterm)}" placeholder="دوّر على محل أو مطعم" aria-label="بحث"></div></div>
+
+    <section class="sec"><div class="sec-head"><h2>التصنيفات</h2></div>
+      <div class="services">
+        <button class="svc" data-cat="" aria-pressed="${st.cat === null}">
+          <span class="bubble b-all">${I('all',22)}</span><span>الكل</span></button>
+        ${cats.map((c) => `<button class="svc" data-cat="${c}" aria-pressed="${st.cat === c}">
+          <span class="bubble b-${c}">${I(c,22)}</span><span>${CAT[c]}</span></button>`).join('')}
+      </div></section>
+
+    <section class="sec"><div class="zones">
+      <button class="zchip" data-pzone="" aria-pressed="${st.pzone === null}">كل القرى</button>
+      ${ZONES.map((z) => `<button class="zchip" data-pzone="${esc(z)}" aria-pressed="${st.pzone === z}">${esc(z)}</button>`).join('')}
+    </div></section>
+
+    <section class="sec">
+      <div class="sec-head"><h2>${st.cat ? CAT[st.cat] : 'كل المحلات'}</h2>
+        ${list.length ? `<span class="side">${list.length}</span>` : ''}</div>
+      ${list.length ? `<div class="cards">${list.map((p, i) => `
+        <article class="row rise" style="animation-delay:${Math.min(i,8)*50}ms">
+          <span class="avatar b-${p.cat}">${I(p.cat,24)}</span>
+          <div>
+            <div class="head"><h3>${esc(p.name)}</h3>
+              ${p.rate ? `<span class="rate">${I('star',13)} ${p.rate}</span>` : ''}</div>
+            <p class="meta">${CAT[p.cat]} ${I('pin',13)} ${esc(p.zone)}</p>
+            ${p.addr ? `<p class="subnote">${esc(p.addr)}</p>` : ''}
+            ${p.hrs ? `<p class="subnote">${I('clock',13)} ${esc(p.hrs)}</p>` : ''}
+            ${p.note ? `<p class="subnote">${esc(p.note)}</p>` : ''}
+            <div class="actions">
+              <button class="btn call" data-sheet="place:${p.id}">اطلب من هنا</button>
+              ${p.wa ? `<a class="btn wa" href="${waLink(p.phone,'السلام عليكم، عايز أطلب من ' + p.name)}"
+                target="_blank" rel="noreferrer" aria-label="واتساب ${esc(p.name)}">${I('wa',22)}</a>` : ''}
+            </div>
+          </div>
+        </article>`).join('')}</div>`
+        : `<div class="empty pop"><h3>مفيش نتايج</h3><p>مفيش محل مطابق للاختيار ده.</p>
+            <button class="btn ghost wide" data-clear="places">شيل الفلاتر</button></div>`}
+    </section>
+    ${foot()}
+  </main>`;
+}
+
+/* ---------- شاشة الطلبات ---------- */
+function viewRequests() {
+  const all = [...st.reqs, ...SEED_REQS];
+  return `
+  <header class="hero">
+    <div class="hero-top"><div class="hero-brand">
+      <span class="hero-logo">${I('clock',20)}</span> لوحة الطلبات</div></div>
+    <h1>مش لاقي حد متاح؟</h1>
+    <p>اكتب اللي محتاجه، واللي هيفتح هيشوفه ويكلمك.</p>
+  </header>
+  <main class="wrap page" style="padding-top:22px">
+    <div class="card">
+      ${st.toast ? `<p class="msg">${I('check',16)} ${esc(st.toast)}</p>` : ''}
+      <label class="field" for="rq-body"><span>محتاج إيه؟</span>
+        <textarea id="rq-body" maxlength="500" placeholder="مثال: محتاج حد يجيبلي دوا من صيدلية في المحلة النهاردة بالليل"></textarea></label>
+      <label class="field" for="rq-phone"><span>رقم موبايلك</span>
+        <input id="rq-phone" type="tel" inputmode="tel" placeholder="01xxxxxxxxx"></label>
+      <div class="checks" style="margin-bottom:10px">
+        <label><input type="checkbox" id="rq-hide" checked> اخفي رقمي</label>
+      </div>
+      <p class="lede" id="rq-hint" style="font-size:13.5px">رقمك هيظهر ناقص كده 0101••••78، والسواقين هيكلموك من جوه التطبيق.</p>
+      <button class="btn call wide" id="rq-send">انشر الطلب</button>
+    </div>
+
+    <h2>الطلبات المفتوحة</h2>
+    ${all.length ? all.map((r) => {
+      const mask = r.phone.slice(0,4) + '••••' + r.phone.slice(-2);
+      return `<div class="req rise">
+        <p>${esc(r.body)}</p>
+        <div class="when">
+          ${r.zone ? `${I('pin',13)} ${esc(r.zone)}` : ''}
+          ${r.kind ? `<span class="pill">${SERVICE[r.kind]}</span>` : ''}
+          ${I('clock',13)} ${since(r.ago ?? Math.floor((Date.now() - r.at) / MIN))}
+          ${r.hide ? `<span class="pill">${I('shield',12)} الرقم مخفي</span>` : ''}
+        </div>
+        ${r.hide
+          ? `<p class="lede" style="margin:10px 0 0;font-size:14px">${esc(mask)} — صاحب الطلب مخفي رقمه.
+              السواقين بيكلموه من جوه التطبيق.</p>`
+          : telBox(r.phone)}
+      </div>`;
+    }).join('') : '<p class="lede">مفيش طلبات دلوقتي. أول واحد يكتب.</p>'}
+
+    <div class="note" style="margin-top:18px">${I('info',19)}
+      <span>الطلب بيختفي لوحده بعد <strong>٦ ساعات</strong>. متكتبش بيانات أكتر من اللازم — الصفحة دي مفتوحة لأي حد.</span></div>
+    ${foot()}
+  </main>`;
+}
+
+/* ---------- شاشة الأسعار ---------- */
+function viewPrices() {
+  return `
+  <header class="hero">
+    <div class="hero-top"><div class="hero-brand">
+      <span class="hero-logo">${I('logo',20)}</span> الأسعار</div></div>
+    <h1>اعرف السعر العادل قبل ما تتفق</h1>
+    <p>دي متوسط اللي بيتدفع في البلد.</p>
+  </header>
+  <main class="wrap page" style="padding-top:22px">
+    <div class="note warn">${I('alert',19)}
+      <span><strong>دي مش تسعيرة ملزمة.</strong> إحنا مش بنحدد أسعار ومش بناخد عمولة.
+        الاتفاق النهائي بينك وبين السائق.</span></div>
+
+    <h2 style="margin-top:0">يبدأ من</h2>
+    <div class="rates">${RATES.map((r) => `
+      <div class="rate-row">
+        <span class="bubble b-${r.k === 'mahalla_run' ? 'mahalla' : r.k}">${I(r.k,22)}</span>
+        <span class="t"><b>${SERVICE[r.k]}</b><span>${esc(r.note)}</span></span>
+        <span class="v"><em>من</em><b>${r.from} ج</b></span>
+      </div>`).join('')}</div>
+
+    <div class="note" style="margin-top:16px">${I('info',19)}
+      <span>العجلة رخيصة عن قصد. الطلب القريب جوه البلد مش محتاج موتوسيكل، وده بيخلي
+        أي حد عنده عجلة يقدر يشتغل ويكسب.</span></div>
+
+    <h2>الأسعار حسب المشوار</h2>
+    <div class="card">${PRICES.map((p) => `
+      <div class="price">
+        <span class="bubble b-${p.k === 'mahalla_run' ? 'mahalla' : p.k}">${I(p.k,20)}</span>
+        <span class="t"><b>${esc(p.t)}</b><span>${esc(p.s)}</span></span>
+        <span class="v">${p.lo}–${p.hi} ج</span>
+      </div>`).join('')}</div>
+
+    <h2>لو محتاج حاجة من المحلة</h2>
+    <div class="card"><p class="lede" style="margin:0">
+      مشوار المحلة ذهاب وعودة تكلفته الحقيقية على السائق ٣٥–٤٥ جنيه بنزين وصيانة، قبل ما ياخد مليم.
+      لو تلات ناس محتاجين حاجة من المحلة في نفس اليوم، مشوار واحد يخدمكم كلكم: كل واحد يدفع أقل
+      والسائق ياخد أكتر.</p></div>
+    ${foot()}
+  </main>`;
+}
+
+const foot = () => `<footer class="foot">
+  <p><strong>في السكة</strong> خدمة مجتمعية مجانية بتعرض بيانات سواقين ومحلات في المنطقة عشان تسهّل
+    التواصل. إحنا مش طرف في أي اتفاق، ومش بناخد عمولة، ومش بنحدد أسعار ملزمة.</p>
+  <p><strong>دي نسخة تجريبية.</strong> الأسماء والأرقام والتقييمات كلها بيانات وهمية للتجربة بس.</p>
+</footer>`;
+
+/* ---------- الورقة السفلية ---------- */
+function sheetHTML() {
+  if (!st.sheet) return '';
+  const [type, id] = st.sheet.split(':');
+  if (type === 'driver') {
+    const d = DRIVERS.find((x) => x.id === id);
+    if (!d) return '';
+    return `<div class="scrim" data-close><div class="sheet" role="dialog" aria-modal="true">
+      <div class="grab"></div>
+      <h2 style="margin:0 0 3px;font-size:19px;font-weight:800">${esc(d.name)}</h2>
+      <p style="margin:0 0 6px;color:var(--ink-500);font-size:14px">
+        ${d.svc.map((s) => SERVICE[s]).join('، ')} · ${esc(d.zone)}</p>
+      ${telBox(d.phone)}
+      <p class="lede" style="margin:12px 0 14px;font-size:13.5px">
+        في التطبيق الحقيقي الزرار ده بيفتح الاتصال على طول.</p>
+      ${d.wa ? `<a class="btn wa wide" style="width:100%;margin-bottom:10px"
+        href="${waLink(d.phone,'السلام عليكم، لقيت رقمك في «في السكة»')}" target="_blank" rel="noreferrer">
+        ${I('wa',20)} افتح واتساب</a>` : ''}
+      <button class="btn quiet wide" data-close>إغلاق</button></div></div>`;
+  }
+  const p = PLACES.find((x) => x.id === id);
+  if (!p) return '';
+  const near = DRIVERS.filter(liveOf).slice(0, 3);
+  const msg = `السلام عليكم، ممكن تستلملي طلب من ${p.name}${p.addr ? ` (${p.addr})` : ''} في ${p.zone}؟`;
+  return `<div class="scrim" data-close><div class="sheet" role="dialog" aria-modal="true">
+    <div class="grab"></div>
+    <h2 style="margin:0 0 3px;font-size:19px;font-weight:800">${esc(p.name)}</h2>
+    <p style="margin:0 0 20px;color:var(--ink-500);font-size:14px">${CAT[p.cat]} · ${esc(p.zone)}</p>
+
+    <div class="step"><span class="n">1</span><div class="c">
+      <b>كلّم المحل واطلب</b>
+      <p>قوله على طلبك، واسأله هيبقى جاهز إمتى وبكام.</p>
+      ${telBox(p.phone)}
+      ${p.wa ? `<a class="btn wa wide" style="width:100%;margin-top:10px"
+        href="${waLink(p.phone,'السلام عليكم، عايز أطلب من ' + p.name)}" target="_blank" rel="noreferrer">
+        ${I('wa',20)} افتح واتساب</a>` : ''}
+    </div></div>
+
+    <div class="step"><span class="n">2</span><div class="c">
+      <b>كلّم سائق يستلم منهم</b>
+      ${near.length === 0
+        ? '<p>مفيش سائق متاح دلوقتي. اكتب طلبك في لوحة الطلبات.</p>'
+        : `<p>الرسالة هتتكتب لوحدها — بس ابعتها.</p>
+           ${near.map((d) => `<div class="mini">${I(d.svc[0],18)}
+             <span class="t"><b>${esc(d.name)}</b><span>${esc(d.veh)}</span></span>
+             ${d.wa ? `<a class="btn wa" style="width:46px;min-height:44px"
+               href="${waLink(d.phone, msg)}" target="_blank" rel="noreferrer"
+               aria-label="واتساب ${esc(d.name)}">${I('wa',19)}</a>`
+             : `<button class="btn quiet" data-copy="${esc(d.phone)}">انسخ رقمه</button>`}
+             </div>`).join('')}`}
+    </div></div>
+
+    <button class="btn quiet wide" data-close>إغلاق</button></div></div>`;
+}
+
+/* ---------- الرسم ---------- */
+const app = document.getElementById('app');
+function render(keepFocus) {
+  const views = { home: viewHome, places: viewPlaces, requests: viewRequests, prices: viewPrices };
+  app.innerHTML = views[st.tab]() + sheetHTML();
+  document.querySelectorAll('.nav button').forEach((b) => {
+    if (b.dataset.tab === st.tab) b.setAttribute('aria-current', 'page');
+    else b.removeAttribute('aria-current');
+  });
+  if (keepFocus) {
+    const el = document.getElementById(keepFocus);
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
+}
+
+/* ---------- التفاعل ---------- */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-tab],[data-kind],[data-zone],[data-cat],[data-pzone],[data-toggle],[data-sheet],[data-close],[data-copy],[data-go],[data-clear]');
+  if (!t) return;
+
+  if (t.dataset.copy !== undefined) {
+    const num = t.dataset.copy;
+    const done = () => { t.textContent = 'اتنسخ ✓'; setTimeout(() => { t.textContent = t.dataset.label || 'انسخ الرقم'; }, 1600); };
+    t.dataset.label = t.dataset.label || t.textContent;
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(num).then(done).catch(() => selectNum(t));
+    else selectNum(t);
+    return;
+  }
+  if (t.dataset.tab) { st.tab = t.dataset.tab; st.sheet = null; st.toast = null; render(); window.scrollTo(0,0); return; }
+  if (t.dataset.go) { st.tab = t.dataset.go; render(); window.scrollTo(0,0); return; }
+  if (t.dataset.kind !== undefined) { st.kind = t.dataset.kind || null; render(); return; }
+  if (t.dataset.zone !== undefined) { st.zone = t.dataset.zone || null; render(); return; }
+  if (t.dataset.cat !== undefined) { st.cat = t.dataset.cat || null; render(); return; }
+  if (t.dataset.pzone !== undefined) { st.pzone = t.dataset.pzone || null; render(); return; }
+  if (t.dataset.clear) { st.cat = null; st.pzone = null; st.pterm = ''; render(); return; }
+  if (t.dataset.toggle) {
+    const d = DRIVERS.find((x) => x.id === t.dataset.toggle);
+    st.off[d.id] = { on: !liveOf(d), at: Date.now() };
+    save(); render(); return;
+  }
+  if (t.dataset.sheet) { st.sheet = t.dataset.sheet; render(); return; }
+  if (t.dataset.close !== undefined) { st.sheet = null; render(); return; }
+});
+
+function selectNum(btn) {
+  const num = btn.closest('.telbox')?.querySelector('.num') || btn.parentElement?.querySelector('.num');
+  if (!num) return;
+  const r = document.createRange(); r.selectNodeContents(num);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  btn.textContent = 'محدد — انسخه';
+}
+
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'q-home') { st.term = e.target.value; render('q-home'); }
+  if (e.target.id === 'q-places') { st.pterm = e.target.value; render('q-places'); }
+  if (e.target.id === 'rq-hide') {
+    const h = document.getElementById('rq-hint');
+    if (h) h.textContent = e.target.checked
+      ? 'رقمك هيظهر ناقص كده 0101••••78، والسواقين هيكلموك من جوه التطبيق.'
+      : 'رقمك هيظهر كامل لأي حد يفتح الصفحة، وأي سائق يقدر يتصل بيك على طول.';
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (e.target.id !== 'rq-send') return;
+  const body = document.getElementById('rq-body').value.trim();
+  const phone = document.getElementById('rq-phone').value.replace(/\s/g, '');
+  const hide = document.getElementById('rq-hide').checked;
+  const hint = document.getElementById('rq-hint');
+  if (body.length < 5) { hint.textContent = 'اكتب طلبك بتفصيل شوية (٥ حروف على الأقل).'; hint.style.color = 'var(--rose)'; return; }
+  if (!/^0\d{9,10}$/.test(phone)) { hint.textContent = 'اكتب رقم موبايل صح، يبدأ بصفر.'; hint.style.color = 'var(--rose)'; return; }
+  st.reqs.unshift({ id: 'u' + Date.now(), body, phone, hide, zone: null, kind: null, at: Date.now() });
+  st.toast = 'طلبك اتنشر. السواقين هيشوفوه دلوقتي.';
+  save(); render(); window.scrollTo(0, 0);
+});
+
+render();
+})();
+</script>
