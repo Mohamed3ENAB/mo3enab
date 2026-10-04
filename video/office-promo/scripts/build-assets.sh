@@ -16,12 +16,20 @@ measure() {
     sed -n '/^{/,/^}/p'
 }
 
+# The source takes are HLG HDR (color_transfer=arib-std-b67, bt2020, 10-bit).
+# Re-tagging them to SDR is NOT enough: ffmpeg carries the HDR tags through a
+# plain transcode, which leaves an 8-bit file still announcing itself as HLG,
+# and every downstream consumer then takes the HDR path. These must be
+# tone-mapped HLG -> BT.709 from the 10-bit originals.
+TONEMAP="zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p"
+
 conform() {
   local src=$1 out=$2 mi=$3 mtp=$4 mlra=$5 mthr=$6 off=$7
   ffmpeg -v warning -stats -i "$src" \
-    -vf "fps=30,scale=1080:1920:flags=lanczos,setsar=1" \
+    -vf "fps=30,scale=1080:1920:flags=lanczos,setsar=1,$TONEMAP" \
     -af "loudnorm=I=-16:TP=-1.5:LRA=11:measured_I=$mi:measured_TP=$mtp:measured_LRA=$mlra:measured_thresh=$mthr:offset=$off:linear=true,aresample=48000" \
     -c:v libx264 -preset medium -crf 17 -pix_fmt yuv420p \
+    -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv \
     -c:a aac -b:a 192k -ar 48000 -ac 2 -movflags +faststart "$out" -y
 }
 
@@ -44,3 +52,11 @@ echo "== synthesising sfx + ambient bed =="
 echo "== done =="
 ffprobe -v error -show_entries format=duration -show_entries stream=codec_name,width,height,r_frame_rate -of csv=p=0 assets/clip1.mp4
 ffprobe -v error -show_entries format=duration -show_entries stream=codec_name,width,height,r_frame_rate -of csv=p=0 assets/clip2.mp4
+
+echo "== colour sanity: both must read bt709, never bt2020/arib-std-b67 =="
+for f in assets/clip1.mp4 assets/clip2.mp4; do
+  echo "--- $f"
+  ffprobe -v error -select_streams v:0 \
+    -show_entries stream=pix_fmt,color_space,color_transfer,color_primaries \
+    -of default=noprint_wrappers=1 "$f"
+done
