@@ -1,0 +1,7 @@
+node_modules/
+snapshots/
+renders/
+# derived media — regenerate with scripts/build-assets.sh from the source uploads
+assets/clip1.mp4
+assets/clip2.mp4
+assets/bed.wav

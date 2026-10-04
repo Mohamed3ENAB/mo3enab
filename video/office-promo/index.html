@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="ar" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Tomorrow World — Office Promo</title>
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Cairo";
+        src: url("assets/fonts/Cairo-var.woff2") format("woff2");
+        font-weight: 200 1000;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Tajawal";
+        src: url("assets/fonts/Tajawal-400.woff2") format("woff2");
+        font-weight: 400;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Tajawal";
+        src: url("assets/fonts/Tajawal-700.woff2") format("woff2");
+        font-weight: 700;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Tajawal";
+        src: url("assets/fonts/Tajawal-900.woff2") format("woff2");
+        font-weight: 900;
+        font-display: block;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #060b14;
+      }
+
+      :root {
+        --navy: 10, 22, 40;
+        --gold: #e8b96a;
+        --gold-hi: #f7d79b;
+        --ink: #061020;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #060b14;
+        font-family: "Cairo", "Tajawal", sans-serif;
+        color: #fff;
+      }
+
+      /* ---------- footage ---------- */
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      /* transform wrappers must be full-frame boxes so scale has a real origin */
+      .cam {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+      }
+      .stage video {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* ---------- always-on grade furniture ---------- */
+      .scrim-bottom {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 760px;
+        background: linear-gradient(
+          to top,
+          rgba(4, 10, 20, 0.88) 0%,
+          rgba(4, 10, 20, 0.62) 34%,
+          rgba(4, 10, 20, 0.22) 68%,
+          rgba(4, 10, 20, 0) 100%
+        );
+        pointer-events: none;
+      }
+      .scrim-top {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 340px;
+        background: linear-gradient(
+          to bottom,
+          rgba(4, 10, 20, 0.6) 0%,
+          rgba(4, 10, 20, 0) 100%
+        );
+        pointer-events: none;
+      }
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 78% 62% at 50% 44%,
+          rgba(0, 0, 0, 0) 52%,
+          rgba(0, 0, 0, 0.42) 100%
+        );
+        pointer-events: none;
+      }
+      .grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.055;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 220px 220px;
+      }
+
+      /* ---------- brand bug ---------- */
+      .bug {
+        position: absolute;
+        top: 74px;
+        right: 64px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 24px 14px 30px;
+        border-radius: 22px;
+        background: linear-gradient(
+          145deg,
+          rgba(var(--navy), 0.78) 0%,
+          rgba(var(--navy), 0.62) 100%
+        );
+        border: 1px solid rgba(232, 185, 106, 0.26);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.46);
+      }
+      .bug .mark {
+        width: 62px;
+        height: 62px;
+        flex: 0 0 62px;
+      }
+      .bug .wordmark {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 25px;
+        letter-spacing: 0.16em;
+        line-height: 1.24;
+        color: #fff;
+        text-transform: uppercase;
+        text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+      }
+      .bug .wordmark span {
+        display: block;
+        font-size: 15px;
+        font-weight: 400;
+        letter-spacing: 0.3em;
+        color: var(--gold);
+      }
+
+      /* ---------- generic card chrome ---------- */
+      .slot {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .glass {
+        background: linear-gradient(
+          145deg,
+          rgba(var(--navy), 0.9) 0%,
+          rgba(var(--navy), 0.78) 100%
+        );
+        border: 1.5px solid rgba(232, 185, 106, 0.42);
+        border-radius: 26px;
+        box-shadow:
+          0 24px 60px rgba(0, 0, 0, 0.55),
+          inset 0 1px 0 rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(14px);
+      }
+      .kicker {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 26px;
+        letter-spacing: 0.1em;
+        color: var(--gold);
+      }
+      /* dark substrate behind any copy that floats over bright footage —
+         the reference's "dark pill behind the text" rule, and what keeps
+         gold-on-daylight above the contrast floor */
+      .plate {
+        display: inline-block;
+        padding: 24px 46px;
+        border-radius: 28px;
+        background: linear-gradient(
+          145deg,
+          rgba(var(--navy), 0.93) 0%,
+          rgba(var(--navy), 0.86) 100%
+        );
+        border: 1.5px solid rgba(232, 185, 106, 0.34);
+        box-shadow: 0 20px 52px rgba(0, 0, 0, 0.58);
+      }
+
+      /* ---------- G1 location lower third ---------- */
+      #lt-wrap {
+        position: absolute;
+        right: 72px;
+        left: 72px;
+        bottom: 430px;
+        display: flex;
+        justify-content: flex-start;
+      }
+      .lt {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 26px 36px 26px 44px;
+        max-width: 930px;
+      }
+      .lt .pin {
+        width: 54px;
+        height: 54px;
+        flex: 0 0 54px;
+      }
+      .lt .txt {
+        text-align: right;
+      }
+      .lt .lab {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 24px;
+        color: var(--gold);
+        letter-spacing: 0.08em;
+        margin-bottom: 4px;
+      }
+      .lt .val {
+        font-weight: 800;
+        font-size: 46px;
+        line-height: 1.32;
+        white-space: nowrap;
+      }
+
+      /* ---------- G2 metro chip ---------- */
+      #metro-wrap {
+        position: absolute;
+        right: 72px;
+        bottom: 352px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px 32px;
+        border-radius: 999px;
+        background: rgba(var(--navy), 0.86);
+        border: 1.5px solid rgba(232, 185, 106, 0.4);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      }
+      .chip svg {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+      }
+      .chip .t {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 34px;
+        line-height: 1.3;
+        white-space: nowrap;
+      }
+
+      /* ---------- G3 price hero ---------- */
+      #price-wrap {
+        position: absolute;
+        right: 72px;
+        left: 72px;
+        bottom: 560px;
+        display: flex;
+        justify-content: center;
+      }
+      .price {
+        padding: 34px 54px 40px;
+        text-align: center;
+        min-width: 760px;
+      }
+      .price .from {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 30px;
+        color: var(--gold);
+        letter-spacing: 0.1em;
+        margin-bottom: 6px;
+      }
+      .price .row {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 18px;
+      }
+      .price .num {
+        /* digits run LTR inside the RTL row so "650,000 درهم" reads in order */
+        direction: ltr;
+        unicode-bidi: isolate;
+        font-weight: 900;
+        font-size: 132px;
+        line-height: 1.16;
+        letter-spacing: -0.02em;
+        background: linear-gradient(170deg, #fff 8%, var(--gold-hi) 52%, var(--gold) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .price .cur {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 900;
+        font-size: 50px;
+        color: var(--gold);
+      }
+      .price .rule {
+        width: 190px;
+        height: 3px;
+        margin: 14px auto 0;
+        background: linear-gradient(
+          90deg,
+          rgba(232, 185, 106, 0) 0%,
+          var(--gold) 50%,
+          rgba(232, 185, 106, 0) 100%
+        );
+      }
+
+      /* ---------- G4 comparison ---------- */
+      #cmp-wrap {
+        position: absolute;
+        right: 72px;
+        left: 72px;
+        bottom: 404px;
+        display: flex;
+        justify-content: center;
+      }
+      .cmp {
+        padding: 22px 40px;
+        border-radius: 22px;
+        background: rgba(var(--navy), 0.88);
+        border: 1.5px solid rgba(232, 185, 106, 0.36);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 38px;
+        line-height: 1.34;
+        white-space: nowrap;
+      }
+      .cmp b {
+        color: var(--gold);
+        font-weight: 900;
+      }
+
+      /* ---------- G5 award ---------- */
+      #award-wrap {
+        position: absolute;
+        right: 72px;
+        left: 72px;
+        top: 620px;
+        display: flex;
+        justify-content: center;
+      }
+      .award {
+        position: relative;
+        padding: 46px 64px 50px;
+        text-align: center;
+        min-width: 820px;
+      }
+      .award .ribbon {
+        width: 86px;
+        height: 86px;
+        margin: 0 auto 16px;
+        display: block;
+      }
+      .award .t1 {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 31px;
+        color: var(--gold);
+        letter-spacing: 0.1em;
+        margin-bottom: 12px;
+      }
+      .award .t2 {
+        font-weight: 900;
+        font-size: 58px;
+        line-height: 1.36;
+      }
+      .award .year {
+        margin-top: 20px;
+        display: inline-block;
+        padding: 10px 40px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--gold-hi) 100%);
+        color: var(--ink);
+        font-weight: 900;
+        font-size: 44px;
+        letter-spacing: 0.06em;
+      }
+      #award-circle {
+        position: absolute;
+        left: -40px;
+        top: -34px;
+        width: 920px;
+        height: 400px;
+        pointer-events: none;
+        overflow: visible;
+      }
+
+      /* ---------- G6 services title ---------- */
+      #svc-wrap {
+        position: absolute;
+        right: 72px;
+        left: 72px;
+        bottom: 420px;
+        text-align: center;
+      }
+      .svc .l1 {
+        font-weight: 900;
+        font-size: 64px;
+        line-height: 1.34;
+        color: var(--gold-hi);
+      }
+      .svc .l2 {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 40px;
+        line-height: 1.4;
+        margin-top: 10px;
+        color: #fff;
+      }
+
+      /* ---------- G7 amenities grid ---------- */
+      #amen-wrap {
+        position: absolute;
+        right: 72px;
+        left: 72px;
+        top: 470px;
+      }
+      .amen-head-row {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .amen-head {
+        font-weight: 900;
+        font-size: 52px;
+        line-height: 1.36;
+        color: #fff;
+      }
+      .amen-head em {
+        font-style: normal;
+        color: var(--gold-hi);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+      }
+      .tile {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 26px 26px;
+        border-radius: 24px;
+        background: linear-gradient(
+          145deg,
+          rgba(var(--navy), 0.92) 0%,
+          rgba(var(--navy), 0.8) 100%
+        );
+        border: 1.5px solid rgba(232, 185, 106, 0.4);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.52);
+      }
+      .tile svg {
+        width: 50px;
+        height: 50px;
+        flex: 0 0 50px;
+      }
+      .tile .n {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 34px;
+        line-height: 1.3;
+      }
+
+      /* ---------- G8 payment ---------- */
+      #pay-wrap {
+        position: absolute;
+        right: 72px;
+        left: 72px;
+        bottom: 300px;
+      }
+      .pay-head-row {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+      .pay-head .k {
+        display: block;
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 28px;
+        line-height: 1.5;
+        letter-spacing: 0.12em;
+        color: var(--gold-hi);
+        margin-bottom: 14px;
+      }
+      .pay-head .h {
+        display: block;
+        font-weight: 900;
+        font-size: 54px;
+        line-height: 1.4;
+        color: #fff;
+      }
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        padding: 22px 32px;
+        border-radius: 24px;
+        background: linear-gradient(
+          145deg,
+          rgba(var(--navy), 0.92) 0%,
+          rgba(var(--navy), 0.8) 100%
+        );
+        border: 1.5px solid rgba(232, 185, 106, 0.4);
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.52);
+      }
+      .step .pct {
+        flex: 0 0 170px;
+        text-align: center;
+        font-weight: 900;
+        font-size: 62px;
+        line-height: 1.2;
+        direction: ltr;
+        background: linear-gradient(170deg, #fff 10%, var(--gold-hi) 55%, var(--gold) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .step .bar {
+        width: 2px;
+        align-self: stretch;
+        background: rgba(232, 185, 106, 0.34);
+        flex: 0 0 2px;
+      }
+      .step .lbl {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 36px;
+        line-height: 1.32;
+      }
+
+      /* ---------- end card ---------- */
+      #end {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 88% 58% at 50% 34%, rgba(34, 58, 96, 0.9) 0%, rgba(6, 11, 20, 0) 72%),
+          linear-gradient(165deg, #0a1628 0%, #060b14 58%, #0d1a2e 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+      }
+      #end .emark {
+        width: 150px;
+        height: 150px;
+        margin-bottom: 30px;
+      }
+      #end .ename {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 700;
+        font-size: 40px;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      #end .esub {
+        font-family: "Tajawal", sans-serif;
+        font-weight: 400;
+        font-size: 21px;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 64px;
+      }
+      #end .ecta {
+        position: relative;
+        overflow: hidden;
+        padding: 30px 76px;
+        border-radius: 999px;
+        border: 2px solid var(--gold);
+        font-weight: 900;
+        font-size: 50px;
+        line-height: 1.3;
+        color: var(--gold-hi);
+      }
+      #end .ecta .shine {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 190px;
+        background: linear-gradient(
+          100deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.4) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+      }
+      #end .enote {
+        margin-top: 42px;
+        font-family: "Tajawal", sans-serif;
+        font-weight: 400;
+        font-size: 28px;
+        letter-spacing: 0.04em;
+        color: rgba(255, 255, 255, 0.64);
+      }
+
+      /* ---------- transition flash ---------- */
+      #flash {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          105deg,
+          rgba(255, 255, 255, 0) 36%,
+          rgba(247, 215, 155, 0.92) 50%,
+          rgba(255, 255, 255, 0) 64%
+        );
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      id="root"
+      dir="rtl"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="45"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- ================= FOOTAGE ================= -->
+      <div class="stage">
+        <div id="w1" class="cam">
+          <video
+            id="shot1"
+            class="clip"
+            src="assets/clip1.mp4"
+            data-start="0"
+            data-duration="20.1"
+            data-media-start="0"
+            data-track-index="0"
+            data-has-audio="true"
+            data-volume="1"
+            playsinline
+          ></video>
+        </div>
+        <div id="w2" class="cam">
+          <video
+            id="shot2"
+            class="clip"
+            src="assets/clip2.mp4"
+            data-start="20.1"
+            data-duration="22.3"
+            data-media-start="0"
+            data-track-index="0"
+            data-has-audio="true"
+            data-volume="1"
+            playsinline
+          ></video>
+        </div>
+      </div>
+
+      <div class="scrim-top"></div>
+      <div class="scrim-bottom"></div>
+      <div class="vignette"></div>
+
+      <!-- ================= BRAND BUG ================= -->
+      <div id="bug-slot" class="clip slot" data-start="0.9" data-duration="41.5" data-track-index="1">
+        <div class="bug">
+          <div class="wordmark">
+            Tomorrow World
+            <span>Real Estate</span>
+          </div>
+          <svg class="mark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <path d="M8 44 L24 14 L40 44 Z" stroke="#e8b96a" stroke-width="3.4" stroke-linejoin="round" />
+            <path d="M24 44 L40 14 L56 44 Z" stroke="#ffffff" stroke-width="3.4" stroke-linejoin="round" opacity="0.92" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- ================= G1 LOCATION ================= -->
+      <div id="g-loc" class="clip slot" data-start="0.5" data-duration="5.1" data-track-index="2">
+        <div id="lt-wrap">
+          <div class="lt glass">
+            <svg class="pin" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <path d="M24 44s14-13.2 14-24A14 14 0 1 0 10 20c0 10.8 14 24 14 24Z" stroke="#e8b96a" stroke-width="3.2" stroke-linejoin="round" />
+              <circle cx="24" cy="19.6" r="5.4" fill="#e8b96a" />
+            </svg>
+            <div class="txt">
+              <div class="lab">الموقــع</div>
+              <div class="val">شارع الشيخ محمد بن زايد</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= G2 METRO ================= -->
+      <div id="g-metro" class="clip slot" data-start="2.6" data-duration="3.0" data-track-index="2">
+        <div id="metro-wrap">
+          <div class="chip">
+            <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+              <rect x="9" y="5" width="22" height="23" rx="6" stroke="#e8b96a" stroke-width="2.8" />
+              <path d="M9 18h22" stroke="#e8b96a" stroke-width="2.6" />
+              <circle cx="15" cy="23.4" r="2.1" fill="#e8b96a" />
+              <circle cx="25" cy="23.4" r="2.1" fill="#e8b96a" />
+              <path d="M14 29l-4 6M26 29l4 6" stroke="#e8b96a" stroke-width="2.6" stroke-linecap="round" />
+            </svg>
+            <div class="t">على خط المترو الجديد</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= G3 PRICE ================= -->
+      <div id="g-price" class="clip slot" data-start="3.9" data-duration="4.7" data-track-index="3">
+        <div id="price-wrap">
+          <div class="price glass">
+            <div class="from">يبــدأ مــن</div>
+            <div class="row">
+              <div class="num" id="price-num">0</div>
+              <div class="cur">درهم</div>
+            </div>
+            <div class="rule"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= G4 COMPARISON ================= -->
+      <div id="g-cmp" class="clip slot" data-start="6.4" data-duration="2.9" data-track-index="2">
+        <div id="cmp-wrap">
+          <div class="cmp">أقــل مـن سعـر <b>استوديو</b> في نفس المشروع</div>
+        </div>
+      </div>
+
+      <!-- ================= G5 AWARD ================= -->
+      <div id="g-award" class="clip slot" data-start="10.4" data-duration="5.6" data-track-index="3">
+        <div id="award-wrap">
+          <div class="award glass">
+            <svg id="award-circle" viewBox="0 0 920 400" fill="none" aria-hidden="true">
+              <path
+                id="award-ellipse"
+                d="M462 22C690 20 886 92 884 198c-2 108-206 182-428 180C240 376 36 304 36 196 36 92 236 24 462 22Z"
+                stroke="#f7d79b"
+                stroke-width="5"
+                stroke-linecap="round"
+                opacity="0.9"
+              />
+            </svg>
+            <svg class="ribbon" viewBox="0 0 88 88" fill="none" aria-hidden="true">
+              <circle cx="44" cy="34" r="23" stroke="#e8b96a" stroke-width="4" />
+              <path d="M44 24l3.6 7.3 8 1.2-5.8 5.6 1.4 8-7.2-3.8-7.2 3.8 1.4-8-5.8-5.6 8-1.2L44 24Z" fill="#e8b96a" />
+              <path d="M32 54l-6 28 18-9 18 9-6-28" stroke="#e8b96a" stroke-width="4" stroke-linejoin="round" />
+            </svg>
+            <div class="t1">حـائــز علــى</div>
+            <div class="t2">أفضل تصميم لمشروع مكاتب</div>
+            <div class="year">2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= G6 SERVICES TITLE ================= -->
+      <div id="g-svc" class="clip slot" data-start="16.9" data-duration="3.1" data-track-index="2">
+        <div id="svc-wrap" class="svc">
+          <div class="plate">
+            <div class="l1">كل الخدمات</div>
+            <div class="l2">اللي ممكن تحتاجها في مشروع واحد</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= G7 AMENITIES ================= -->
+      <div id="g-amen" class="clip slot" data-start="20.6" data-duration="8.2" data-track-index="3">
+        <div id="amen-wrap">
+          <div class="amen-head-row" id="amen-head">
+            <div class="plate"><div class="amen-head">مشروع <em>متكامل</em></div></div>
+          </div>
+          <div class="grid">
+            <div class="tile" id="t1">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <ellipse cx="24" cy="17" rx="13" ry="15" stroke="#e8b96a" stroke-width="3" />
+                <path d="M24 32v12" stroke="#e8b96a" stroke-width="3.4" stroke-linecap="round" />
+                <circle cx="19" cy="14" r="1.9" fill="#e8b96a" />
+                <circle cx="29" cy="14" r="1.9" fill="#e8b96a" />
+                <circle cx="24" cy="21" r="1.9" fill="#e8b96a" />
+              </svg>
+              <div class="n">ملاعب بادل</div>
+            </div>
+            <div class="tile" id="t2">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <rect x="6" y="11" width="36" height="26" rx="5" stroke="#e8b96a" stroke-width="3" />
+                <path d="M21 20l9 4.8-9 4.8V20Z" fill="#e8b96a" />
+                <path d="M6 41h36" stroke="#e8b96a" stroke-width="3" stroke-linecap="round" />
+              </svg>
+              <div class="n">دور سينما</div>
+            </div>
+            <div class="tile" id="t3">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M14 18v12M34 18v12" stroke="#e8b96a" stroke-width="3.6" stroke-linecap="round" />
+                <path d="M8 21v6M40 21v6" stroke="#e8b96a" stroke-width="3.6" stroke-linecap="round" />
+                <path d="M14 24h20" stroke="#e8b96a" stroke-width="3.6" stroke-linecap="round" />
+              </svg>
+              <div class="n">دور جيم</div>
+            </div>
+            <div class="tile" id="t4">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M24 6c6 7 9 11 9 16a9 9 0 1 1-18 0c0-5 3-9 9-16Z" stroke="#e8b96a" stroke-width="3" stroke-linejoin="round" />
+                <path d="M11 34h26l-3 8H14l-3-8Z" stroke="#e8b96a" stroke-width="3" stroke-linejoin="round" />
+              </svg>
+              <div class="n">باربكيو إيريا</div>
+            </div>
+            <div class="tile" id="t5">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M9 14h24v12a12 12 0 0 1-24 0V14Z" stroke="#e8b96a" stroke-width="3" stroke-linejoin="round" />
+                <path d="M33 17h4a5 5 0 0 1 0 10h-4" stroke="#e8b96a" stroke-width="3" />
+                <path d="M7 42h30" stroke="#e8b96a" stroke-width="3" stroke-linecap="round" />
+              </svg>
+              <div class="n">كافيــه</div>
+            </div>
+            <div class="tile" id="t6">
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <path d="M24 6l16 16H8L24 6Z" stroke="#e8b96a" stroke-width="3" stroke-linejoin="round" />
+                <path d="M24 22v20" stroke="#e8b96a" stroke-width="3.2" stroke-linecap="round" />
+                <path d="M14 42h20" stroke="#e8b96a" stroke-width="3.2" stroke-linecap="round" />
+              </svg>
+              <div class="n">جلسات خارجية</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= G8 PAYMENT ================= -->
+      <div id="g-pay" class="clip slot" data-start="29.7" data-duration="11.6" data-track-index="3">
+        <div id="pay-wrap">
+          <div class="pay-head-row" id="pay-head">
+            <div class="plate pay-head">
+              <span class="k">خطــة الدفــع</span>
+              <span class="h">تقسيط حتى الاستلام</span>
+            </div>
+          </div>
+          <div class="steps">
+            <div class="step" id="s1">
+              <div class="pct">20%</div>
+              <div class="bar"></div>
+              <div class="lbl">دفعــة أولــى</div>
+            </div>
+            <div class="step" id="s2">
+              <div class="pct">40%</div>
+              <div class="bar"></div>
+              <div class="lbl">أقساط حتى الاستلام</div>
+            </div>
+            <div class="step" id="s3">
+              <div class="pct">60%</div>
+              <div class="bar"></div>
+              <div class="lbl">عنــد الاستــلام</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= TRANSITION FLASH ================= -->
+      <div id="flash-slot" class="clip slot" data-start="20.0" data-duration="0.6" data-track-index="5">
+        <div id="flash"></div>
+      </div>
+
+      <!-- ================= END CARD ================= -->
+      <div id="end-slot" class="clip" data-start="42.4" data-duration="2.6" data-track-index="6">
+        <div id="end">
+          <svg class="emark" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <path d="M8 44 L24 14 L40 44 Z" stroke="#e8b96a" stroke-width="3.2" stroke-linejoin="round" />
+            <path d="M24 44 L40 14 L56 44 Z" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round" opacity="0.92" />
+          </svg>
+          <div class="ename">Tomorrow World</div>
+          <div class="esub">Real Estate Development</div>
+          <div class="ecta">
+            كلّمنــا دلوقتــي
+            <div class="shine" id="cta-shine"></div>
+          </div>
+          <div class="enote">نبعتلك كل التفاصيل وخطة السداد</div>
+        </div>
+      </div>
+
+      <div class="grain"></div>
+
+      <!-- ================= AUDIO ================= -->
+      <audio id="sfx-bed" src="assets/bed.wav" data-start="0" data-duration="45" data-track-index="10" data-volume="0.07"></audio>
+
+      <audio id="sfx-w1" src="assets/whoosh.wav" data-start="0.5" data-duration="0.5" data-track-index="11" data-volume="0.17"></audio>
+      <audio id="sfx-t1" src="assets/tick.wav" data-start="2.62" data-duration="0.11" data-track-index="11" data-volume="0.14"></audio>
+      <audio id="sfx-sub1" src="assets/subhit.wav" data-start="3.92" data-duration="0.75" data-track-index="12" data-volume="0.24"></audio>
+      <audio id="sfx-d1" src="assets/ding.wav" data-start="3.98" data-duration="1.1" data-track-index="11" data-volume="0.15"></audio>
+      <audio id="sfx-t2" src="assets/tick.wav" data-start="6.42" data-duration="0.11" data-track-index="11" data-volume="0.14"></audio>
+
+      <audio id="sfx-d2" src="assets/ding.wav" data-start="10.44" data-duration="1.1" data-track-index="11" data-volume="0.16"></audio>
+      <audio id="sfx-sub2" src="assets/subhit.wav" data-start="10.42" data-duration="0.75" data-track-index="12" data-volume="0.2"></audio>
+      <audio id="sfx-w2" src="assets/whoosh.wav" data-start="16.9" data-duration="0.5" data-track-index="11" data-volume="0.17"></audio>
+
+      <audio id="sfx-wd1" src="assets/whoosh_down.wav" data-start="19.98" data-duration="0.45" data-track-index="11" data-volume="0.22"></audio>
+      <audio id="sfx-sub3" src="assets/subhit.wav" data-start="20.1" data-duration="0.75" data-track-index="12" data-volume="0.26"></audio>
+
+      <audio id="sfx-a1" src="assets/tick.wav" data-start="21.1" data-duration="0.11" data-track-index="11" data-volume="0.13"></audio>
+      <audio id="sfx-a2" src="assets/tick.wav" data-start="21.9" data-duration="0.11" data-track-index="11" data-volume="0.13"></audio>
+      <audio id="sfx-a3" src="assets/tick.wav" data-start="22.7" data-duration="0.11" data-track-index="11" data-volume="0.13"></audio>
+      <audio id="sfx-a4" src="assets/tick.wav" data-start="24.3" data-duration="0.11" data-track-index="11" data-volume="0.13"></audio>
+      <audio id="sfx-a5" src="assets/tick.wav" data-start="25.3" data-duration="0.11" data-track-index="11" data-volume="0.13"></audio>
+      <audio id="sfx-a6" src="assets/tick.wav" data-start="26.5" data-duration="0.11" data-track-index="11" data-volume="0.13"></audio>
+
+      <audio id="sfx-w3" src="assets/whoosh.wav" data-start="29.7" data-duration="0.5" data-track-index="11" data-volume="0.17"></audio>
+      <audio id="sfx-p1" src="assets/tick.wav" data-start="32.9" data-duration="0.11" data-track-index="11" data-volume="0.15"></audio>
+      <audio id="sfx-p2" src="assets/tick.wav" data-start="35.0" data-duration="0.11" data-track-index="11" data-volume="0.15"></audio>
+      <audio id="sfx-p3" src="assets/tick.wav" data-start="38.7" data-duration="0.11" data-track-index="11" data-volume="0.15"></audio>
+
+      <audio id="sfx-riser" src="assets/riser.wav" data-start="41.1" data-duration="1.4" data-track-index="12" data-volume="0.2"></audio>
+      <audio id="sfx-sub4" src="assets/subhit.wav" data-start="42.4" data-duration="0.75" data-track-index="13" data-volume="0.28"></audio>
+    </div>
+
+    <script>
+      function build() {
+        const tl = gsap.timeline({ paused: true });
+        const E = "power3.out";
+
+        /* ---------- footage camera ---------- */
+        // subtle punch on the price beat, then release
+        tl.fromTo("#w1", { scale: 1 }, { scale: 1.05, duration: 0.3, ease: "power2.out" }, 3.9)
+          .to("#w1", { scale: 1, duration: 0.7, ease: "power2.inOut" }, 6.6);
+
+        // slow Ken Burns across the model b-roll, settles as he returns
+        tl.fromTo(
+          "#w2",
+          { scale: 1 },
+          { scale: 1.07, duration: 8.6, ease: "none" },
+          20.2,
+        ).to("#w2", { scale: 1, duration: 1.0, ease: "power2.inOut" }, 28.9);
+
+        /* ---------- brand bug ---------- */
+        tl.fromTo("#bug-slot .bug", { opacity: 0, x: 26 }, { opacity: 1, x: 0, duration: 0.6, ease: E }, 0.9)
+          .to("#bug-slot .bug", { opacity: 0, duration: 0.4 }, 41.9);
+
+        /* ---------- G1 location ---------- */
+        tl.fromTo("#lt-wrap .lt", { opacity: 0, x: 70 }, { opacity: 1, x: 0, duration: 0.6, ease: E }, 0.5)
+          .fromTo("#lt-wrap .pin", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" }, 0.72)
+          .to("#lt-wrap .lt", { opacity: 0, x: 40, duration: 0.42, ease: "power2.in" }, 5.1);
+
+        /* ---------- G2 metro ---------- */
+        tl.fromTo("#metro-wrap .chip", { opacity: 0, x: 54, scale: 0.94 }, { opacity: 1, x: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" }, 2.6)
+          .to("#metro-wrap .chip", { opacity: 0, x: 30, duration: 0.38, ease: "power2.in" }, 5.2);
+
+        /* ---------- G3 price ---------- */
+        const money = { v: 0 };
+        tl.fromTo("#price-wrap .price", { opacity: 0, y: 52, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.62, ease: "back.out(1.4)" }, 3.9)
+          .to(money, {
+            v: 650000,
+            duration: 1.15,
+            ease: "power2.out",
+            onUpdate: () => {
+              const el = document.getElementById("price-num");
+              if (el) el.textContent = Math.round(money.v).toLocaleString("en-US");
+            },
+          }, 4.02)
+          .fromTo("#price-wrap .rule", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: E }, 4.5)
+          .to("#price-wrap .price", { opacity: 0, y: -34, duration: 0.45, ease: "power2.in" }, 8.1);
+
+        /* ---------- G4 comparison ---------- */
+        tl.fromTo("#cmp-wrap .cmp", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 6.4)
+          .to("#cmp-wrap .cmp", { opacity: 0, y: -22, duration: 0.4, ease: "power2.in" }, 8.9);
+
+        /* ---------- G5 award ---------- */
+        const ell = document.getElementById("award-ellipse");
+        if (ell) {
+          const len = ell.getTotalLength();
+          gsap.set(ell, { strokeDasharray: len, strokeDashoffset: len });
+          tl.to(ell, { strokeDashoffset: 0, duration: 0.95, ease: "power1.inOut" }, 11.3);
+        }
+        tl.fromTo("#award-wrap .award", { opacity: 0, scale: 0.9, y: 40 }, { opacity: 1, scale: 1, y: 0, duration: 0.66, ease: "back.out(1.3)" }, 10.4)
+          .fromTo("#award-wrap .ribbon", { scale: 0.3, opacity: 0, rotate: -22 }, { scale: 1, opacity: 1, rotate: 0, duration: 0.6, ease: "back.out(2.2)" }, 10.62)
+          .fromTo("#award-wrap .t2", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 10.9)
+          .fromTo("#award-wrap .year", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.4)" }, 11.25)
+          .to("#award-wrap .award", { opacity: 0, scale: 0.96, duration: 0.5, ease: "power2.in" }, 15.45);
+
+        /* ---------- G6 services title ---------- */
+        tl.fromTo("#svc-wrap .l1", { opacity: 0, x: 58 }, { opacity: 1, x: 0, duration: 0.55, ease: E }, 16.9)
+          .fromTo("#svc-wrap .l2", { opacity: 0, x: 42 }, { opacity: 1, x: 0, duration: 0.55, ease: E }, 17.08)
+          .to("#svc-wrap", { opacity: 0, duration: 0.4, ease: "power2.in" }, 19.6);
+
+        /* ---------- transition flash at the clip join ---------- */
+        tl.fromTo("#flash", { opacity: 0, xPercent: -115 }, { opacity: 1, duration: 0.14, ease: "none" }, 20.0)
+          .to("#flash", { xPercent: 115, duration: 0.42, ease: "power2.inOut" }, 20.04)
+          .to("#flash", { opacity: 0, duration: 0.16, ease: "none" }, 20.4);
+
+        /* ---------- G7 amenities ---------- */
+        tl.fromTo("#amen-head", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 20.6);
+        const tiles = [
+          ["#t1", 21.1],
+          ["#t2", 21.9],
+          ["#t3", 22.7],
+          ["#t4", 24.3],
+          ["#t5", 25.3],
+          ["#t6", 26.5],
+        ];
+        tiles.forEach(([sel, at]) => {
+          tl.fromTo(sel, { opacity: 0, x: 46, scale: 0.94 }, { opacity: 1, x: 0, scale: 1, duration: 0.5, ease: "back.out(1.5)" }, at);
+        });
+        tl.to("#amen-wrap", { opacity: 0, y: -26, duration: 0.5, ease: "power2.in" }, 28.3);
+
+        /* ---------- G8 payment ---------- */
+        tl.fromTo("#pay-head", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.55, ease: E }, 29.7);
+        [
+          ["#s1", 32.9],
+          ["#s2", 35.0],
+          ["#s3", 38.7],
+        ].forEach(([sel, at]) => {
+          tl.fromTo(sel, { opacity: 0, x: 60, scale: 0.95 }, { opacity: 1, x: 0, scale: 1, duration: 0.55, ease: "back.out(1.4)" }, at);
+        });
+        tl.to("#pay-wrap", { opacity: 0, y: -30, duration: 0.5, ease: "power2.in" }, 40.8);
+
+        /* ---------- end card ---------- */
+        tl.fromTo("#end", { opacity: 0 }, { opacity: 1, duration: 0.42, ease: "power2.out" }, 42.4)
+          .fromTo("#end .emark", { opacity: 0, scale: 0.55, y: 22 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(2)" }, 42.5)
+          .fromTo("#end .ename", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 42.72)
+          .fromTo("#end .esub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 42.84)
+          .fromTo("#end .ecta", { opacity: 0, scale: 0.88 }, { opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.8)" }, 43.0)
+          .fromTo("#cta-shine", { xPercent: -420, opacity: 0.9 }, { xPercent: 420, duration: 0.9, ease: "power2.inOut" }, 43.45)
+          .fromTo("#end .enote", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 43.3);
+
+        window.__timelines["main"] = tl;
+        tl.seek(0);
+      }
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(build);
+      } else {
+        build();
+      }
+    </script>
+  </body>
+</html>
